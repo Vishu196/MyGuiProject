@@ -99,8 +99,7 @@ public class displayFrame
 		springLayout.putConstraint(SpringLayout.EAST, Readings_panel, -10, SpringLayout.EAST, mainFrame.getContentPane());
 		mainFrame.getContentPane().add(Readings_panel);
 		
-		
-		
+			
 		JScrollPane scrollPane = new JScrollPane();
 		springLayout.putConstraint(SpringLayout.SOUTH, scrollPane, -10, SpringLayout.NORTH, Cmnd_panel);
 		springLayout.putConstraint(SpringLayout.EAST, scrollPane, 250, SpringLayout.WEST, mainFrame.getContentPane());
@@ -159,12 +158,12 @@ public class displayFrame
 		mnNewMenu1.add(mnNewMenu1Item2);
 		mnNewMenu1Item2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				/*String dev_name;
-				dev_name = SerialNetw.getConName();
+				String dev_name;
+				dev_name = GUI.getConName();
 				if (dev_name != null) {
-					SerialNetw.spDisconn(dev_name);
+					GUI.spDisconn(dev_name);
 				}
-		        DispUpdate_Timer.stop();*/
+		        DispUpdate_Timer.stop();
 		        System.exit(0);
 			}
 		});
@@ -172,7 +171,7 @@ public class displayFrame
 		
 		
 		
-	/*	CreateChart();
+		CreateChart();
         DispUpdate_Timer = new Timer(250, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -180,7 +179,7 @@ public class displayFrame
                 DispUpdate_Timer.restart();
             }
         });
-		*/
+		
 		
        // DispUpdate_Timer.start();
         Downl_Cnt = 0;
