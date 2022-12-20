@@ -8,10 +8,13 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Timer;
 
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
 //import javax.swing.JButton;
 //import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -25,6 +28,7 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
+import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -35,7 +39,9 @@ public class displayFrame
 {
 	
 	private JFrame mainFrame;
-	private JTextField cmnd_Field;
+	private JTextField cmnd_Field, reading1_Field,reading2_Field, reading3_Field;
+	
+	private JButton Connect, Disconnect, Graph;
 	private JPanel Graph_panel;
 	private JTextPane tout_textPane;
 	private Timer DispUpdate_Timer;
@@ -43,7 +49,7 @@ public class displayFrame
 	static boolean Pb_Ready;
 	private SimpleAttributeSet TextSet = new SimpleAttributeSet();
 	static final int NTRACES = 4;
-	static ITrace2D mtraces[] = new ITrace2D[4];
+	//static ITrace2D mtraces[] = new ITrace2D[4];
 	static Chart2D chart;
 	  
 	
@@ -77,6 +83,8 @@ public class displayFrame
 		SpringLayout springLayout =  new SpringLayout();
 		mainFrame.getContentPane().setLayout(springLayout);
 		
+		Border border1 = BorderFactory.createLineBorder(Color.BLACK,2);
+
 		JPanel Cmnd_panel = new JPanel();
 		Cmnd_panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		FlowLayout flowLayout = (FlowLayout) Cmnd_panel.getLayout();
@@ -97,9 +105,82 @@ public class displayFrame
 		springLayout.putConstraint(SpringLayout.SOUTH, Readings_panel, 40, SpringLayout.NORTH, mainFrame.getContentPane());
 		springLayout.putConstraint(SpringLayout.WEST, Readings_panel, 10, SpringLayout.WEST, mainFrame.getContentPane());
 		springLayout.putConstraint(SpringLayout.EAST, Readings_panel, -10, SpringLayout.EAST, mainFrame.getContentPane());
-		mainFrame.getContentPane().add(Readings_panel);
 		
-			
+		Connect = new JButton();
+		Connect.setText("Connect");
+		Connect.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				
+			}
+		});
+		Connect.setFocusable(false);
+		Connect.setHorizontalAlignment(SwingConstants.LEFT);
+		Connect.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		Readings_panel.add(Connect);
+
+		Disconnect = new JButton();
+		Disconnect.setText("Disconnect");
+		Disconnect.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				
+			}
+		});
+		Disconnect.setFocusable(false);
+		Disconnect.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		Readings_panel.add(Disconnect);
+
+		
+		JLabel readingLbl1 = new JLabel("SpO2(%):");
+		Readings_panel.add(readingLbl1);
+		reading1_Field = new JTextField();
+		reading1_Field.setText("95");
+		Readings_panel.add(reading1_Field);
+		reading1_Field.setColumns(5);
+		reading1_Field.setEditable(false);
+		reading1_Field.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		reading1_Field.setBackground(Color.WHITE);
+
+		Readings_panel.add(reading1_Field);
+
+
+		JLabel readingLbl2 = new JLabel("BPM:");
+		Readings_panel.add(readingLbl2);
+		reading2_Field = new JTextField();
+		reading2_Field.setText("88");
+		Readings_panel.add(reading2_Field);
+		reading2_Field.setColumns(5);
+		reading2_Field.setEditable(false);
+		reading2_Field.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		reading2_Field.setBackground(Color.WHITE);
+
+		JLabel readingLbl3 = new JLabel("PPG:");
+		Readings_panel.add(readingLbl3);
+		reading3_Field = new JTextField();
+		reading3_Field.setText("1.2");
+		Readings_panel.add(reading3_Field);
+		reading3_Field.setColumns(5);
+		reading3_Field.setEditable(false);
+		reading3_Field.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		reading3_Field.setBackground(Color.WHITE);
+		
+		Graph = new JButton();
+		Graph.setText("Plot Graph");
+		Graph.setHorizontalAlignment(SwingConstants.RIGHT);
+		Graph.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				
+			}
+		});
+		Graph.setFocusable(false);
+		Graph.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		Readings_panel.add(Graph);
+
+		
+		mainFrame.getContentPane().add(Readings_panel);
+
 		JScrollPane scrollPane = new JScrollPane();
 		springLayout.putConstraint(SpringLayout.SOUTH, scrollPane, -10, SpringLayout.NORTH, Cmnd_panel);
 		springLayout.putConstraint(SpringLayout.EAST, scrollPane, 250, SpringLayout.WEST, mainFrame.getContentPane());
@@ -163,7 +244,7 @@ public class displayFrame
 				if (dev_name != null) {
 					GUI.spDisconn(dev_name);
 				}
-		        DispUpdate_Timer.stop();
+		      //  DispUpdate_Timer.stop();
 		        System.exit(0);
 			}
 		});
@@ -171,92 +252,12 @@ public class displayFrame
 		
 		
 		
-		CreateChart();
-        DispUpdate_Timer = new Timer(250, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                UpdateDynamic();
-                DispUpdate_Timer.restart();
-            }
-        });
 		
+		}
+
+
+
 		
-       // DispUpdate_Timer.start();
-        Downl_Cnt = 0;
-        Pb_NValues = 0;
-        Pb_Ready = false;
-	
-	
-		}
-	
-	  private void PrintTextWin(String tWstr, int tWstyle, boolean newline) {
-	        try {
-	            Document doc = tout_textPane.getStyledDocument();
-	            StyleConstants.setItalic(TextSet, false);
-	            StyleConstants.setBold(TextSet, false);
-	            StyleConstants.setForeground(TextSet, Color.BLACK);
-	            switch (tWstyle) {
-	                case 0:
-	                    StyleConstants.setBold(TextSet, true);
-	                    StyleConstants.setForeground(TextSet, Color.DARK_GRAY);
-	                    break;
-	                case 1: StyleConstants.setForeground(TextSet, Color.BLUE);
-	                    break;
-	                case 2: StyleConstants.setForeground(TextSet, Color.BLACK);
-	                    break;
-	                case 3: StyleConstants.setForeground(TextSet, Color.RED);
-	                	break;
-	                case 4: StyleConstants.setForeground(TextSet, Color.GREEN);
-	                	break;
-	                default:
-	                    doc.remove(0, doc.getLength());
-	            }
-	            if (tWstyle >= 0) {
-	            	tout_textPane.setCharacterAttributes(TextSet, true);
-	            	if (newline) {
-	                    doc.insertString(doc.getLength(), tWstr+"\n", TextSet);            		
-	            	} else {
-	                    doc.insertString(doc.getLength(), tWstr, TextSet);
-	            	}
-	            }
-	        } catch (BadLocationException ex) {
-	            System.out.println(ex.toString());
-	        }
-	    }
-
-
-		private void ClearChart()
-		{
-			int  k;
-			for (k = 0; k < NTRACES; k++) {
-				mtraces[k].removeAllPoints();
-				mtraces[k].addPoint(0.0, 0.0);
-			}
-		}
-
-
-
-		private void CreateChart()
-		{
-			int  k;
-
-			chart = new Chart2D();
-			for (k = 0; k < NTRACES; k++) {
-				mtraces[k] = new Trace2DSimple();
-		        chart.addTrace(mtraces[k]);
-			}
-	        mtraces[0].setColor(Color.blue);     mtraces[0].setName("trace 0");
-	        mtraces[1].setColor(Color.red);      mtraces[1].setName("trace 1");
-	        mtraces[2].setColor(Color.green);    mtraces[2].setName("trace 2");
-	        mtraces[3].setColor(Color.magenta);  mtraces[3].setName("trace 3");
-	        Graph_panel.setLayout(new BorderLayout(0, 0));
-	        
-	        Graph_panel.add(chart);
-	        Graph_panel.setSize(100,200);
-	        chart.setVisible(true);
-	        Graph_panel.setVisible(true);
-	        Graph_panel.repaint();	
-		}
 
 
 		
