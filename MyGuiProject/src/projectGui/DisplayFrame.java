@@ -29,7 +29,7 @@ import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
 
-public class displayFrame 
+public class DisplayFrame 
 {
 	
 	private JFrame mainFrame;
@@ -53,7 +53,7 @@ public class displayFrame
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					displayFrame window = new displayFrame();
+					DisplayFrame window = new DisplayFrame();
 					window.mainFrame.setVisible(true);
 				}
 			catch (Exception e) {
@@ -65,7 +65,7 @@ public class displayFrame
 	});
 	}
 		
-	public displayFrame() {
+	public DisplayFrame() {
 		initialize();
 	}
 	
