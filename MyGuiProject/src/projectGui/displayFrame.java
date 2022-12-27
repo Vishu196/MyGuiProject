@@ -1,22 +1,15 @@
 package projectGui;
 
-import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.traces.Trace2DSimple;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Timer;
+import javax.swing.Timer;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
-//import javax.swing.JButton;
-//import javax.swing.JComboBox;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -28,29 +21,29 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
-import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
+
+import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IAxis;
+import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.traces.Trace2DLtd;
+import info.monitorenter.gui.chart.traces.Trace2DSimple;
 
 public class displayFrame 
 {
 	
 	private JFrame mainFrame;
-	private JTextField cmnd_Field, reading1_Field,reading2_Field, reading3_Field;
-	
-	private JButton Connect, Disconnect, Graph;
+	private JTextField cmnd_Field, spo2Field,bpmField, ppgField;
+	private JComboBox<String> portList ;
+	private JButton Connect, Disconnect, plotGraph, clearGraph;
 	private JPanel Graph_panel;
 	private JTextPane tout_textPane;
-	private Timer DispUpdate_Timer;
-	static int Downl_Cnt, Pb_NValues;
-	static boolean Pb_Ready;
-	private SimpleAttributeSet TextSet = new SimpleAttributeSet();
-	static final int NTRACES = 4;
-	//static ITrace2D mtraces[] = new ITrace2D[4];
+	private Timer rTimer;
+	public int var = 1;
+	public int i = 0;
 	static Chart2D chart;
+	private ITrace2D trace;
+	
 	  
 	
 	public static void main(String[] args) {
@@ -75,6 +68,9 @@ public class displayFrame
 	}
 	
 	private void initialize() {
+		
+		//Making the frame for display, adding buttons and panels
+		
 		mainFrame = new JFrame();
 		mainFrame.setTitle("Pulseoximeter GUI");
 		mainFrame.setVisible(true);
@@ -83,8 +79,7 @@ public class displayFrame
 		SpringLayout springLayout =  new SpringLayout();
 		mainFrame.getContentPane().setLayout(springLayout);
 		
-		Border border1 = BorderFactory.createLineBorder(Color.BLACK,2);
-
+		// adding command panel
 		JPanel Cmnd_panel = new JPanel();
 		Cmnd_panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		FlowLayout flowLayout = (FlowLayout) Cmnd_panel.getLayout();
@@ -96,6 +91,7 @@ public class displayFrame
 		springLayout.putConstraint(SpringLayout.SOUTH, Cmnd_panel, -10, SpringLayout.SOUTH, mainFrame.getContentPane());
 		mainFrame.getContentPane().add(Cmnd_panel);
 		
+		// adding reading panel
 		JPanel Readings_panel = new JPanel();
 		Readings_panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		FlowLayout flowLayout1 = (FlowLayout) Readings_panel.getLayout();
@@ -106,10 +102,12 @@ public class displayFrame
 		springLayout.putConstraint(SpringLayout.WEST, Readings_panel, 10, SpringLayout.WEST, mainFrame.getContentPane());
 		springLayout.putConstraint(SpringLayout.EAST, Readings_panel, -10, SpringLayout.EAST, mainFrame.getContentPane());
 		
-		Connect = new JButton();
-		Connect.setText("Connect");
+		// adding connect button and drop down for selecting port
+		portList = new JComboBox<String>();
+		Connect = new JButton("Connect");
+		
 		Connect.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
+		public void actionPerformed(ActionEvent arg0) {
 				
 				
 			}
@@ -117,8 +115,12 @@ public class displayFrame
 		Connect.setFocusable(false);
 		Connect.setHorizontalAlignment(SwingConstants.LEFT);
 		Connect.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		portList.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		Readings_panel.add(portList);
 		Readings_panel.add(Connect);
-
+				
+		
+		// adding disconnect button
 		Disconnect = new JButton();
 		Disconnect.setText("Disconnect");
 		Disconnect.addActionListener(new ActionListener() {
@@ -132,55 +134,93 @@ public class displayFrame
 		Readings_panel.add(Disconnect);
 
 		
+				
+		// adding readings label and title
 		JLabel readingLbl1 = new JLabel("SpO2(%):");
 		Readings_panel.add(readingLbl1);
-		reading1_Field = new JTextField();
-		reading1_Field.setText("95");
-		Readings_panel.add(reading1_Field);
-		reading1_Field.setColumns(5);
-		reading1_Field.setEditable(false);
-		reading1_Field.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		reading1_Field.setBackground(Color.WHITE);
+		spo2Field = new JTextField();
+		Readings_panel.add(spo2Field);
+		spo2Field.setColumns(5);
+		spo2Field.setEditable(false);
+		spo2Field.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		spo2Field.setBackground(Color.WHITE);
+		
+		rTimer = new Timer(1000,new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	displayReading(96+var, 88+var, 1+var);
+            	var++;
+            	rTimer.restart();
+              
+            }
+        });
+		rTimer.start();
+		
+		
 
-		Readings_panel.add(reading1_Field);
-
+		Readings_panel.add(spo2Field);
 
 		JLabel readingLbl2 = new JLabel("BPM:");
 		Readings_panel.add(readingLbl2);
-		reading2_Field = new JTextField();
-		reading2_Field.setText("88");
-		Readings_panel.add(reading2_Field);
-		reading2_Field.setColumns(5);
-		reading2_Field.setEditable(false);
-		reading2_Field.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		reading2_Field.setBackground(Color.WHITE);
+		bpmField = new JTextField();
+		Readings_panel.add(bpmField);
+		bpmField.setColumns(5);
+		bpmField.setEditable(false);
+		bpmField.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		bpmField.setBackground(Color.WHITE);
 
 		JLabel readingLbl3 = new JLabel("PPG:");
 		Readings_panel.add(readingLbl3);
-		reading3_Field = new JTextField();
-		reading3_Field.setText("1.2");
-		Readings_panel.add(reading3_Field);
-		reading3_Field.setColumns(5);
-		reading3_Field.setEditable(false);
-		reading3_Field.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		reading3_Field.setBackground(Color.WHITE);
+		ppgField = new JTextField();
+		Readings_panel.add(ppgField);
+		ppgField.setColumns(5);
+		ppgField.setEditable(false);
+		ppgField.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		ppgField.setBackground(Color.WHITE);
 		
-		Graph = new JButton();
-		Graph.setText("Plot Graph");
-		Graph.setHorizontalAlignment(SwingConstants.RIGHT);
-		Graph.addActionListener(new ActionListener() {
+		// adding graph button
+		plotGraph = new JButton();
+		plotGraph.setText("Plot Graph");
+		plotGraph.setHorizontalAlignment(SwingConstants.RIGHT);
+		plotGraph.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+				rTimer = new Timer(1000,new ActionListener() {
+		            @Override
+		            public void actionPerformed(ActionEvent e) {
+		            	var++;
+		            	i++;
+		            	clearChart();
+		            	
+		            	plotChart(i,5);
+		            	
+		                rTimer.restart();
+		              
+		            }
+		        });
+				rTimer.start();
 				
 			}
 		});
-		Graph.setFocusable(false);
-		Graph.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		Readings_panel.add(Graph);
-
+		plotGraph.setFocusable(false);
+		plotGraph.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		Readings_panel.add(plotGraph);
 		
-		mainFrame.getContentPane().add(Readings_panel);
+		clearGraph = new JButton();
+		clearGraph.setText("Clear Graph");
+		clearGraph.setHorizontalAlignment(SwingConstants.RIGHT);
+		clearGraph.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				clearChart();
+								
+			}
+		});
+		clearGraph.setFocusable(false);
+		clearGraph.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		Readings_panel.add(clearGraph);
 
+		mainFrame.getContentPane().add(Readings_panel);
+		
+		//adding scroll pane
 		JScrollPane scrollPane = new JScrollPane();
 		springLayout.putConstraint(SpringLayout.SOUTH, scrollPane, -10, SpringLayout.NORTH, Cmnd_panel);
 		springLayout.putConstraint(SpringLayout.EAST, scrollPane, 250, SpringLayout.WEST, mainFrame.getContentPane());
@@ -203,7 +243,6 @@ public class displayFrame
 		cmnd_Field.setColumns(60);
 		mainFrame.getContentPane().add(scrollPane);
 		
-		
 		Graph_panel = new JPanel();
 		Graph_panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		springLayout.putConstraint(SpringLayout.NORTH, Graph_panel, 50, SpringLayout.NORTH, mainFrame.getContentPane());
@@ -216,6 +255,7 @@ public class displayFrame
 		scrollPane.setViewportView(tout_textPane);
 		mainFrame.getContentPane().add(Graph_panel);
 		
+		// adding menu bar and items 
 		JMenuBar menuBar = new JMenuBar();
 		mainFrame.setJMenuBar(menuBar);
 		
@@ -239,37 +279,71 @@ public class displayFrame
 		mnNewMenu1.add(mnNewMenu1Item2);
 		mnNewMenu1Item2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String dev_name;
+			/*	String dev_name;
 				dev_name = GUI.getConName();
 				if (dev_name != null) {
-					GUI.spDisconn(dev_name);
-				}
+					GUI.spDisconn(dev_name);*/
+				
 		      //  DispUpdate_Timer.stop();
 		        System.exit(0);
 			}
 		});
 		
-		
-		
-		
-		
+		createChart();	
 		}
+	
 
+	
+	 
+	//making function for displaying value
+	public void displayReading(int spo2, int bpm, int ppg) {
+	
+		spo2Field.setText(Integer.toString(spo2));
+		bpmField.setText(Integer.toString(bpm));
+		ppgField.setText(Integer.toString(ppg));
 
+	}
 
 		
-
-
+	//a method for updating all values of GUI
+	public void updateDynamic() {
 		
 		
 	}
-		
-		
-		
-		
 	
+	private void createChart() {
+		
+		chart = new Chart2D();
+		trace = new Trace2DLtd(200);
+		trace.setColor(Color.RED);
+		IAxis axisX = chart.getAxisX();
+	    axisX.setPaintGrid(true);
+	    IAxis axisY = chart.getAxisY();
+	    axisY.setPaintGrid(true);
+		chart.addTrace(trace);
+		
+		Graph_panel.setLayout(new BorderLayout(0, 0));
+		Graph_panel.add(chart);
+		chart.setVisible(true);
+		chart.setSize(600, 500);
+		Graph_panel.setVisible(true);
+		Graph_panel.repaint();
+		
+	}
+	private void plotChart(int xaxis, int yaxis) {
+		
+		trace.addPoint(xaxis, yaxis);
+	}
+	
+	private void clearChart() {
+		
+		trace.removeAllPoints();
+		trace.addPoint(0, 0);
+		
+	}
 
-			 
+} 
+
 	
 
 	
