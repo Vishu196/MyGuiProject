@@ -2,6 +2,7 @@ package projectGui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -27,7 +28,6 @@ import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
-import info.monitorenter.gui.chart.traces.Trace2DSimple;
 
 public class displayFrame 
 {
@@ -39,10 +39,12 @@ public class displayFrame
 	private JPanel Graph_panel;
 	private JTextPane tout_textPane;
 	private Timer rTimer;
+	private Timer pTimer;
 	public int var = 1;
 	public int i = 0;
 	static Chart2D chart;
 	private ITrace2D trace;
+    int numTraces = 50;
 	
 	  
 	
@@ -96,16 +98,20 @@ public class displayFrame
 		Readings_panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		FlowLayout flowLayout1 = (FlowLayout) Readings_panel.getLayout();
 		flowLayout1.setHgap(10);
+		flowLayout1.setVgap(2);
 		flowLayout1.setAlignment(FlowLayout.LEFT);
 		springLayout.putConstraint(SpringLayout.NORTH, Readings_panel, 10, SpringLayout.NORTH, mainFrame.getContentPane());
-		springLayout.putConstraint(SpringLayout.SOUTH, Readings_panel, 40, SpringLayout.NORTH, mainFrame.getContentPane());
+		springLayout.putConstraint(SpringLayout.SOUTH, Readings_panel, 45, SpringLayout.NORTH, mainFrame.getContentPane());
 		springLayout.putConstraint(SpringLayout.WEST, Readings_panel, 10, SpringLayout.WEST, mainFrame.getContentPane());
 		springLayout.putConstraint(SpringLayout.EAST, Readings_panel, -10, SpringLayout.EAST, mainFrame.getContentPane());
 		
 		// adding connect button and drop down for selecting port
 		portList = new JComboBox<String>();
-		Connect = new JButton("Connect");
-		
+		portList.addItem("COM5");
+		portList.addItem("COM6");
+		portList.addItem("COM7");
+		Connect = new JButton("Connect ");
+				
 		Connect.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent arg0) {
 				
@@ -113,16 +119,18 @@ public class displayFrame
 			}
 		});
 		Connect.setFocusable(false);
-		Connect.setHorizontalAlignment(SwingConstants.LEFT);
 		Connect.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		portList.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		Dimension d = new Dimension ();
+		d.setSize(500, 200);
+		Connect.setMinimumSize(d);
+				
 		Readings_panel.add(portList);
 		Readings_panel.add(Connect);
 				
 		
 		// adding disconnect button
 		Disconnect = new JButton();
-		Disconnect.setText("Disconnect");
+		Disconnect.setText("Disconnect ");
 		Disconnect.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
@@ -150,7 +158,7 @@ public class displayFrame
             public void actionPerformed(ActionEvent e) {
             	displayReading(96+var, 88+var, 1+var);
             	var++;
-            	rTimer.restart();
+            	rTimer.start();
               
             }
         });
@@ -177,27 +185,27 @@ public class displayFrame
 		ppgField.setEditable(false);
 		ppgField.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		ppgField.setBackground(Color.WHITE);
-		
+		pTimer = new Timer(1000,new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	plotChart(i,5+1);
+            	System.out.printf("Plotted\n");
+            	i++;
+            	pTimer.restart();
+              
+            }
+        });
 		// adding graph button
 		plotGraph = new JButton();
-		plotGraph.setText("Plot Graph");
+		plotGraph.setText("Plot Graph ");
 		plotGraph.setHorizontalAlignment(SwingConstants.RIGHT);
 		plotGraph.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				rTimer = new Timer(1000,new ActionListener() {
-		            @Override
-		            public void actionPerformed(ActionEvent e) {
-		            	var++;
-		            	i++;
-		            	clearChart();
-		            	
-		            	plotChart(i,5);
-		            	
-		                rTimer.restart();
-		              
-		            }
-		        });
-				rTimer.start();
+				if(pTimer.isRunning()) {
+					return;
+				}
+				else
+					pTimer.start();
 				
 			}
 		});
@@ -206,10 +214,13 @@ public class displayFrame
 		Readings_panel.add(plotGraph);
 		
 		clearGraph = new JButton();
-		clearGraph.setText("Clear Graph");
+		clearGraph.setText("Clear Graph ");
 		clearGraph.setHorizontalAlignment(SwingConstants.RIGHT);
 		clearGraph.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				if(pTimer.isRunning()) {
+					pTimer.stop();
+				}
 				clearChart();
 								
 			}
@@ -314,7 +325,7 @@ public class displayFrame
 	private void createChart() {
 		
 		chart = new Chart2D();
-		trace = new Trace2DLtd(200);
+		trace = new Trace2DLtd(numTraces);
 		trace.setColor(Color.RED);
 		IAxis axisX = chart.getAxisX();
 	    axisX.setPaintGrid(true);
@@ -330,15 +341,14 @@ public class displayFrame
 		Graph_panel.repaint();
 		
 	}
-	private void plotChart(int xaxis, int yaxis) {
-		
+	private void plotChart(int xaxis, int yaxis) {	
 		trace.addPoint(xaxis, yaxis);
 	}
 	
 	private void clearChart() {
-		
+		i=0;
 		trace.removeAllPoints();
-		trace.addPoint(0, 0);
+		//trace.addPoint(0, 0);
 		
 	}
 
