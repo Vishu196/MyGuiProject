@@ -36,8 +36,8 @@ public class DisplayFrame
 	private JTextField cmnd_Field, spo2Field,bpmField, ppgField;
 	private JComboBox<String> portList ;
 	private JButton Connect, Disconnect, plotGraph, clearGraph;
-	private JPanel Graph_panel;
-	private JTextPane tout_textPane;
+	private JPanel graphPanel;
+	private JTextPane toutTextPane;
 	private Timer rTimer;
 	private Timer pTimer;
 	public int var = 1;
@@ -107,9 +107,12 @@ public class DisplayFrame
 		
 		// adding connect button and drop down for selecting port
 		portList = new JComboBox<String>();
-		portList.addItem("COM5");
-		portList.addItem("COM6");
-		portList.addItem("COM7");
+		String[] ports = SerialNetwork.getCommPorts() ;
+		for (int p =0; p < ports.length; p++) {
+			portList.addItem(ports[p]);
+		}
+		
+		
 		Connect = new JButton("Connect ");
 				
 		Connect.addActionListener(new ActionListener() {
@@ -254,17 +257,17 @@ public class DisplayFrame
 		cmnd_Field.setColumns(60);
 		mainFrame.getContentPane().add(scrollPane);
 		
-		Graph_panel = new JPanel();
-		Graph_panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		springLayout.putConstraint(SpringLayout.NORTH, Graph_panel, 50, SpringLayout.NORTH, mainFrame.getContentPane());
-		springLayout.putConstraint(SpringLayout.WEST, Graph_panel, 10, SpringLayout.EAST, scrollPane);
-		springLayout.putConstraint(SpringLayout.SOUTH, Graph_panel, -10, SpringLayout.NORTH, Cmnd_panel);
-		springLayout.putConstraint(SpringLayout.EAST, Graph_panel, -10, SpringLayout.EAST, mainFrame.getContentPane());
+		graphPanel = new JPanel();
+		graphPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		springLayout.putConstraint(SpringLayout.NORTH, graphPanel, 50, SpringLayout.NORTH, mainFrame.getContentPane());
+		springLayout.putConstraint(SpringLayout.WEST, graphPanel, 10, SpringLayout.EAST, scrollPane);
+		springLayout.putConstraint(SpringLayout.SOUTH, graphPanel, -10, SpringLayout.NORTH, Cmnd_panel);
+		springLayout.putConstraint(SpringLayout.EAST, graphPanel, -10, SpringLayout.EAST, mainFrame.getContentPane());
 		
-		tout_textPane = new JTextPane();
-		tout_textPane.setEditable(false);
-		scrollPane.setViewportView(tout_textPane);
-		mainFrame.getContentPane().add(Graph_panel);
+		toutTextPane = new JTextPane();
+		toutTextPane.setEditable(false);
+		scrollPane.setViewportView(toutTextPane);
+		mainFrame.getContentPane().add(graphPanel);
 		
 		// adding menu bar and items 
 		JMenuBar menuBar = new JMenuBar();
@@ -333,12 +336,12 @@ public class DisplayFrame
 	    axisY.setPaintGrid(true);
 		chart.addTrace(trace);
 		
-		Graph_panel.setLayout(new BorderLayout(0, 0));
-		Graph_panel.add(chart);
+		graphPanel.setLayout(new BorderLayout(0, 0));
+		graphPanel.add(chart);
 		chart.setVisible(true);
 		chart.setSize(600, 500);
-		Graph_panel.setVisible(true);
-		Graph_panel.repaint();
+		graphPanel.setVisible(true);
+		graphPanel.repaint();
 		
 	}
 	private void plotChart(int xaxis, int yaxis) {	
