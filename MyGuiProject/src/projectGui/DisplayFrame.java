@@ -8,9 +8,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Writer;
-
 import javax.swing.Timer;
-
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -29,7 +27,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
-
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.ITrace2D;
@@ -45,7 +42,7 @@ public class DisplayFrame
 	private JPanel graphPanel;
 	private JTextPane toutTextPane;
 	private Timer rTimer;
-	private Timer pTimer;
+	private Timer pTimer, displayUpdateTimer;
 	public int var = 1;
 	public int i = 0;
 	static Chart2D chart;
@@ -53,8 +50,6 @@ public class DisplayFrame
     int numTraces = 50;
     private SimpleAttributeSet TextSet = new SimpleAttributeSet();
 
-	
-	  
 	
 	public static void main(String[] args) {
 		
@@ -66,11 +61,9 @@ public class DisplayFrame
 				}
 			catch (Exception e) {
 				e.printStackTrace();
+				}	
 			}
-		}
-		
-			
-	});
+		});
 	}
 		
 	public DisplayFrame() {
@@ -121,22 +114,18 @@ public class DisplayFrame
 		}
 				
 		Connect = new JButton("Connect ");
-				
 		Connect.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent arg0) {
 			actionConnect();
 		}
-				
-				});
+			});
 		Connect.setFocusable(false);
 		Connect.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		Dimension d = new Dimension ();
 		d.setSize(500, 200);
 		Connect.setMinimumSize(d);
-				
 		Readings_panel.add(portList);
 		Readings_panel.add(Connect);
-				
 		
 		// adding disconnect button
 		Disconnect = new JButton();
@@ -144,14 +133,11 @@ public class DisplayFrame
 		Disconnect.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				actionDisconnect();
-			
 			}
 		});
 		Disconnect.setFocusable(false);
 		Disconnect.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		Readings_panel.add(Disconnect);
-
-		
 				
 		// adding readings label and title
 		JLabel readingLbl1 = new JLabel("SpO2(%):");
@@ -162,20 +148,6 @@ public class DisplayFrame
 		spo2Field.setEditable(false);
 		spo2Field.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		spo2Field.setBackground(Color.WHITE);
-		
-		rTimer = new Timer(1000,new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            	displayReading(96+var, 88+var, 1+var);
-            	var++;
-            	rTimer.start();
-              
-            }
-        });
-		rTimer.start();
-		
-		
-
 		Readings_panel.add(spo2Field);
 
 		JLabel readingLbl2 = new JLabel("BPM:");
@@ -195,28 +167,17 @@ public class DisplayFrame
 		ppgField.setEditable(false);
 		ppgField.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		ppgField.setBackground(Color.WHITE);
-		pTimer = new Timer(1000,new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            	plotChart(i,5+1);
-            	System.out.printf("Plotted\n");
-            	i++;
-            	pTimer.restart();
-              
-            }
-        });
+		
 		// adding graph button
 		plotGraph = new JButton();
 		plotGraph.setText("Plot Graph ");
 		plotGraph.setHorizontalAlignment(SwingConstants.RIGHT);
 		plotGraph.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if(pTimer.isRunning()) {
-					return;
-				}
-				else
-					pTimer.start();
-				
+			
+				plotEnable = true;
+				Pb_NValues = 0;
+				Downl_Cnt = 0;
 			}
 		});
 		plotGraph.setFocusable(false);
@@ -228,9 +189,7 @@ public class DisplayFrame
 		clearGraph.setHorizontalAlignment(SwingConstants.RIGHT);
 		clearGraph.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if(pTimer.isRunning()) {
-					pTimer.stop();
-				}
+				plotEnable = false;
 				clearChart();
 								
 			}
@@ -302,12 +261,21 @@ public class DisplayFrame
 			}
 		});
 		
-		createChart();	
-		}
+		createChart();
+		
+		displayUpdateTimer =  new Timer(250, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				updateDynamic();
+				displayUpdateTimer.restart();
+			}
+		});
+		displayUpdateTimer.start();
+		Downl_Cnt = 0;
+        Pb_NValues = 0;
+        Pb_Ready = false;
+	}
 	
-
-	
-	 
 	//making function for displaying value
 	public void displayReading(int spo2, int bpm, int ppg) {
 	
@@ -315,13 +283,6 @@ public class DisplayFrame
 		bpmField.setText(Integer.toString(bpm));
 		ppgField.setText(Integer.toString(ppg));
 
-	}
-
-		
-	//a method for updating all values of GUI
-	public void updateDynamic() {
-		
-		
 	}
 	
 	private void createChart() {
@@ -423,23 +384,25 @@ public class DisplayFrame
 			printTextWin("FPGA Control Help:", 1, true);
 			printTextWin("    clc - clear text window", 1, true);	
 			printTextWin("    clg - clear chart window", 1, true);				
-			printTextWin("    conn {comX} - connect", 1, true);			
-			printTextWin("    disconn - disconnect", 1, true);			
+			printTextWin("    connect - connect", 1, true);			
+			printTextWin("    disconnect - disconnect", 1, true);			
 			printTextWin("    .{sendstring}", 1, true);
-		} else if (command.startsWith("conn")) {
+		} else if (command.startsWith("connect")) {
 			actionConnect();
-		} else if (command.equals("disconn")) {
+		} else if (command.equals("disconnect")) {
 			actionDisconnect();
 		} else if (command.equals("exit")) {
-			/*dev_name = SerialNetw.getConName();
+			dev_name = SerialNetwork.getConnectionName();
 			if (dev_name != null) {
-				SerialNetw.spDisconn(dev_name);
+				SerialNetwork.disconnectPort();
 			}
-	        DispUpdate_Timer.stop();
-	        System.exit(0);*/
+			displayUpdateTimer.stop();
+	        System.exit(0);
 		} else if (command.equals("downl")) {
 			
+			
 		} else if (command.startsWith("plot")) {
+			
 			
 		} else if (command.startsWith(".")) {
 			if (SerialNetwork.getConnectionName() != null) {
@@ -451,8 +414,67 @@ public class DisplayFrame
 			printTextWin("*** command???: \"" + command + "\"", 3, true);
 		}
 	}
+	
 
 
+	//a method for updating all values of GUI
+	public void updateDynamic() {
+		
+		String  recv_s;
+    	String  splits[];
+    	int  k;
+    	
+    	while ((recv_s = SerialNetwork.ReadString()) != null) {
+			// System.out.println("["+ recv_s + "]");
+    		if (recv_s.startsWith("$")) {
+        		printTextWin("+", 1, false);
+    			Downl_Cnt++;
+    			if (Downl_Cnt >= 25) {
+    				Downl_Cnt = 0;
+    				printTextWin("\n    ", 1, false);
+    			}
+				splits = recv_s.split(",");
+				try {
+    				for (k = 1; k < NCOLS + 1; k++) {
+    					Plot_Buffer[Pb_NValues][k-1] = (double)Integer.parseInt(splits[k]);
+    				}
+    				System.out.printf("Values: %d %d %d\n", (int) Plot_Buffer[Pb_NValues][0],(int) Plot_Buffer[Pb_NValues][1],(int) Plot_Buffer[Pb_NValues][2]);
+    				displayReading((int) Plot_Buffer[Pb_NValues][0],(int) Plot_Buffer[Pb_NValues][1],(int) Plot_Buffer[Pb_NValues][2]);				
+    				if(plotEnable) {
+    					plotChart(Pb_NValues, (int) Plot_Buffer[Pb_NValues][1]);
+    				}
+    				if(Pb_NValues >= NROWS-1) {
+    					printTextWin("\nDownload finished.", 1, true);
+    	        		Pb_Ready = true;
+    	        		Pb_NValues = 0;
+    	        		plotEnable = false;
+    				}
+    				else {
+    					Pb_NValues++;
+    				}
+    				  
+    				System.out.println("PBNVALUE: " + Pb_NValues);
+				} catch  (NumberFormatException e) {
+			        System.out.println(e.toString());
+			    }
+    			if (recv_s.startsWith("~")) {
+        			SerialNetwork.SendString("p\n");				
+    			}
+    		} else if (recv_s.startsWith("###")) {
+        		//printTextWin("\nDownload finished.", 1, true);
+        		//Pb_Ready = true;
+    		} else {
+        		printTextWin(recv_s, 0, true);    			
+    		}
+    	}
+	}
+	
+	static int Downl_Cnt;
+    static boolean Pb_Ready;
+    static final int NROWS = 60, NCOLS = 3;
+    static double Plot_Buffer[][] = new double[NROWS][NCOLS];
+    static int Pb_NValues;
+    boolean plotEnable = false;
 } 
 
 	
