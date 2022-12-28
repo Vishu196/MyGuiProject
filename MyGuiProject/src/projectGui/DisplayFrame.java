@@ -23,6 +23,10 @@ import javax.swing.JTextPane;
 import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 import javax.swing.border.EtchedBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
@@ -45,6 +49,8 @@ public class DisplayFrame
 	static Chart2D chart;
 	private ITrace2D trace;
     int numTraces = 50;
+    private SimpleAttributeSet TextSet = new SimpleAttributeSet();
+
 	
 	  
 	
@@ -111,16 +117,15 @@ public class DisplayFrame
 		for (int p =0; p < ports.length; p++) {
 			portList.addItem(ports[p]);
 		}
-		
-		
+				
 		Connect = new JButton("Connect ");
 				
 		Connect.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent arg0) {
+			actionConnect();
+		}
 				
-				
-			}
-		});
+				});
 		Connect.setFocusable(false);
 		Connect.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		Dimension d = new Dimension ();
@@ -136,8 +141,8 @@ public class DisplayFrame
 		Disconnect.setText("Disconnect ");
 		Disconnect.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
-				
+				actionDisconnect();
+			
 			}
 		});
 		Disconnect.setFocusable(false);
@@ -285,19 +290,11 @@ public class DisplayFrame
 		mnNewMenu.add(mnNewMenuItem1);
 		
 		
-		JMenuItem mnNewMenu1Item = new JMenuItem("Connect");
-		JMenuItem mnNewMenu1Item1 = new JMenuItem("Disconnect");
 		JMenuItem mnNewMenu1Item2 = new JMenuItem("Exit");
-		mnNewMenu1.add(mnNewMenu1Item);
-		mnNewMenu1.add(mnNewMenu1Item1);
 		mnNewMenu1.add(mnNewMenu1Item2);
 		mnNewMenu1Item2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-			/*	String dev_name;
-				dev_name = GUI.getConName();
-				if (dev_name != null) {
-					GUI.spDisconn(dev_name);*/
-				
+				SerialNetwork.disconnectPort();
 		      //  DispUpdate_Timer.stop();
 		        System.exit(0);
 			}
@@ -353,6 +350,62 @@ public class DisplayFrame
 		trace.removeAllPoints();
 		//trace.addPoint(0, 0);
 		
+	}
+	
+	private void actionConnect() {
+		boolean checkConnect = SerialNetwork.connectPort(portList.getSelectedItem().toString());
+		if (checkConnect) {
+			String c = "Connected to " + SerialNetwork.getConnectionName();
+			printTextWin(c,1,true);
+		}
+		else {
+			String f = "Connection failed" ;
+			printTextWin(f,3,true); 
+		}
+	}
+	
+	private void actionDisconnect() {
+		String name = SerialNetwork.getConnectionName();
+		SerialNetwork.disconnectPort();
+		String d = name + " Disconnected";
+		printTextWin(d,1,true);
+	}
+	
+	private void printTextWin(String t, int tstyle, boolean newline) {
+		try {
+			Document doc = toutTextPane.getStyledDocument();
+			StyleConstants.setItalic(TextSet, false);
+            StyleConstants.setBold(TextSet, false);
+            StyleConstants.setForeground(TextSet, Color.BLACK);
+            switch (tstyle) {
+            case 0:
+                StyleConstants.setBold(TextSet, true);
+                StyleConstants.setForeground(TextSet, Color.DARK_GRAY);
+                break;
+            case 1: StyleConstants.setForeground(TextSet, Color.BLUE);
+                break;
+            case 2: StyleConstants.setForeground(TextSet, Color.BLACK);
+                break;
+            case 3: StyleConstants.setForeground(TextSet, Color.RED);
+            	break;
+            case 4: StyleConstants.setForeground(TextSet, Color.GREEN);
+            	break;
+            default:
+                doc.remove(0, doc.getLength());
+        }
+        if (tstyle >= 0) {
+        	toutTextPane.setCharacterAttributes(TextSet, true);
+        	if (newline) {
+                doc.insertString(doc.getLength(), t+"\n", TextSet);            		
+        	} else {
+                doc.insertString(doc.getLength(), t, TextSet);
+        	}
+        }
+	}
+		catch(BadLocationException ex) {
+            System.out.println(ex.toString());
+			
+		}
 	}
 
 } 
