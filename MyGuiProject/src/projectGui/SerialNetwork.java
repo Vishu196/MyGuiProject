@@ -67,10 +67,9 @@ public class SerialNetwork {
 	
 	static String ReadString() {
     	String  recv_str;
-        byte[] c_arr;
         byte[] d_arr = new byte[32];
         int idx = 0;
-        int chunkSize = 8;
+        int chunkSize = DisplayFrame.NCOLS * 2 + 1;
         recv_str = null;
         if (isConnected == true) {
 	        try {
@@ -88,7 +87,7 @@ public class SerialNetwork {
 	            	}
 	            	d_arr[idx] = sof[0];
 	            	idx++;
-	            	for(int i = 0;i<3; i++) {
+	            	for(int i = 0;i<DisplayFrame.NCOLS; i++) {
 	            		mPort.readBytes(sof, 1);
 	            		while(sof[0] != ',') {
 		            		d_arr[idx] = sof[0];

@@ -7,7 +7,6 @@ import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.Writer;
 import javax.swing.Timer;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -38,11 +37,10 @@ public class DisplayFrame
 	private JFrame mainFrame;
 	private JTextField cmnd_Field, spo2Field,bpmField, ppgField;
 	private JComboBox<String> portList ;
-	private JButton Connect, Disconnect, plotGraph, clearGraph;
+	private JButton Start, Connect, R, Disconnect, plotGraph, clearGraph;
 	private JPanel graphPanel;
 	private JTextPane toutTextPane;
-	private Timer rTimer;
-	private Timer pTimer, displayUpdateTimer;
+	private Timer displayUpdateTimer;
 	public int var = 1;
 	public int i = 0;
 	static Chart2D chart;
@@ -106,13 +104,36 @@ public class DisplayFrame
 		springLayout.putConstraint(SpringLayout.WEST, Readings_panel, 10, SpringLayout.WEST, mainFrame.getContentPane());
 		springLayout.putConstraint(SpringLayout.EAST, Readings_panel, -10, SpringLayout.EAST, mainFrame.getContentPane());
 		
+		// adding Start button
+		Start = new JButton();
+		Start.setText("Start ");
+		Start.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+			}
+		});
+		Start.setFocusable(false);
+		Start.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		Readings_panel.add(Start);
+		
 		// adding connect button and drop down for selecting port
 		portList = new JComboBox<String>();
 		String[] ports = SerialNetwork.getCommPorts() ;
 		for (int p =0; p < ports.length; p++) {
 			portList.addItem(ports[p]);
 		}
-				
+		
+		// adding button to refresh the available comm ports
+		R = new JButton(" R ");
+		R.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent arg0) {
+			
+		}
+			});
+		R.setFocusable(false);
+		R.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		R.setBackground(Color.LIGHT_GRAY);
+		
 		Connect = new JButton("Connect ");
 		Connect.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent arg0) {
@@ -121,10 +142,8 @@ public class DisplayFrame
 			});
 		Connect.setFocusable(false);
 		Connect.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		Dimension d = new Dimension ();
-		d.setSize(500, 200);
-		Connect.setMinimumSize(d);
 		Readings_panel.add(portList);
+		Readings_panel.add(R);
 		Readings_panel.add(Connect);
 		
 		// adding disconnect button
@@ -330,7 +349,7 @@ public class DisplayFrame
 	private void actionDisconnect() {
 		String name = SerialNetwork.getConnectionName();
 		SerialNetwork.disconnectPort();
-		String d = name + " Disconnected";
+		String d = "\n" + name + " Disconnected";
 		printTextWin(d,1,true);
 	}
 	
@@ -372,9 +391,8 @@ public class DisplayFrame
 	}
 	
 	private void CommandHandler(String cmds) {
-		String command = cmds, dev_name, fname;
-		int  k, q, stat;
-		Writer out = null;
+		String command = cmds, dev_name;
+	
 
 		if (command.equals("clc")) {
 			toutTextPane.setText("");
@@ -439,7 +457,7 @@ public class DisplayFrame
     					Plot_Buffer[Pb_NValues][k-1] = (double)Integer.parseInt(splits[k]);
     				}
     				System.out.printf("Values: %d %d %d\n", (int) Plot_Buffer[Pb_NValues][0],(int) Plot_Buffer[Pb_NValues][1],(int) Plot_Buffer[Pb_NValues][2]);
-    				displayReading((int) Plot_Buffer[Pb_NValues][0],(int) Plot_Buffer[Pb_NValues][1],(int) Plot_Buffer[Pb_NValues][2]);				
+    				displayReading((int) Plot_Buffer[Pb_NValues][0],(int) Plot_Buffer[Pb_NValues][1],(int) Plot_Buffer[Pb_NValues][2]);		
     				if(plotEnable) {
     					plotChart(Pb_NValues, (int) Plot_Buffer[Pb_NValues][1]);
     				}
