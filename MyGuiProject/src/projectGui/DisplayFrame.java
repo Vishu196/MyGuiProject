@@ -7,6 +7,8 @@ import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Writer;
+
 import javax.swing.Timer;
 
 import javax.swing.JButton;
@@ -253,7 +255,7 @@ public class DisplayFrame
 		cmnd_Field = new JTextField();
 		cmnd_Field.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				//CommandHandler(cmnd_Field.getText());
+				CommandHandler(cmnd_Field.getText());
 				cmnd_Field.setText("");
 			}
 		});
@@ -407,6 +409,49 @@ public class DisplayFrame
 			
 		}
 	}
+	
+	private void CommandHandler(String cmds) {
+		String command = cmds, dev_name, fname;
+		int  k, q, stat;
+		Writer out = null;
+
+		if (command.equals("clc")) {
+			toutTextPane.setText("");
+		} else if (command.equals("clg")) {
+			clearChart();
+		} else if (command.equals("help")) {
+			printTextWin("FPGA Control Help:", 1, true);
+			printTextWin("    clc - clear text window", 1, true);	
+			printTextWin("    clg - clear chart window", 1, true);				
+			printTextWin("    conn {comX} - connect", 1, true);			
+			printTextWin("    disconn - disconnect", 1, true);			
+			printTextWin("    .{sendstring}", 1, true);
+		} else if (command.startsWith("conn")) {
+			actionConnect();
+		} else if (command.equals("disconn")) {
+			actionDisconnect();
+		} else if (command.equals("exit")) {
+			/*dev_name = SerialNetw.getConName();
+			if (dev_name != null) {
+				SerialNetw.spDisconn(dev_name);
+			}
+	        DispUpdate_Timer.stop();
+	        System.exit(0);*/
+		} else if (command.equals("downl")) {
+			
+		} else if (command.startsWith("plot")) {
+			
+		} else if (command.startsWith(".")) {
+			if (SerialNetwork.getConnectionName() != null) {
+				SerialNetwork.SendString(command.substring(1) + "\n");
+			} else {
+				printTextWin("*** no connected device", 3, true);				
+			}
+		} else if (command.length() > 0) {
+			printTextWin("*** command???: \"" + command + "\"", 3, true);
+		}
+	}
+
 
 } 
 

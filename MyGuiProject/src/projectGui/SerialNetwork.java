@@ -45,6 +45,13 @@ public class SerialNetwork {
 		}
 		return isConnected;
 	}
+	 
+	static void SendString(String tstr) {
+	        if (isConnected == true) {
+	            mPort.writeBytes(tstr.getBytes(), tstr.length());
+	        }
+	    }
+
 	
 	static void disconnectPort() {
 		if (isConnected == true) {
