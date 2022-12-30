@@ -5,7 +5,6 @@ import com.fazecast.jSerialComm.SerialPort;
 public class SerialNetwork {
 	
 	static final int nPortsMax = 10;
-	private int nPorts = 0;
 	static private boolean isConnected = false;
 	static SerialPort mPort;
 	static private String mPortName = null;

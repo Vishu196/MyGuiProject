@@ -2,12 +2,16 @@ package projectGui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+
 import javax.swing.Timer;
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -37,7 +41,7 @@ public class DisplayFrame
 	private JFrame mainFrame;
 	private JTextField cmnd_Field, spo2Field,bpmField, ppgField;
 	private JComboBox<String> portList ;
-	private JButton Start, Connect, R, Disconnect, plotGraph, clearGraph;
+	private JButton Start, Connect, R, Disconnect, plotGraph, clearGraph, saveGraph;
 	private JPanel graphPanel;
 	private JTextPane toutTextPane;
 	private Timer displayUpdateTimer;
@@ -45,7 +49,7 @@ public class DisplayFrame
 	public int i = 0;
 	static Chart2D chart;
 	private ITrace2D trace;
-    int numTraces = 50;
+    private int numTraces = 50;
     private SimpleAttributeSet TextSet = new SimpleAttributeSet();
 
 	
@@ -76,7 +80,7 @@ public class DisplayFrame
 		mainFrame.setTitle("Pulseoximeter GUI");
 		mainFrame.setVisible(true);
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		mainFrame.setBounds(100, 100, 850, 600);
+		mainFrame.setBounds(100, 100, 930, 600);
 		SpringLayout springLayout =  new SpringLayout();
 		mainFrame.getContentPane().setLayout(springLayout);
 		
@@ -104,30 +108,17 @@ public class DisplayFrame
 		springLayout.putConstraint(SpringLayout.WEST, Readings_panel, 10, SpringLayout.WEST, mainFrame.getContentPane());
 		springLayout.putConstraint(SpringLayout.EAST, Readings_panel, -10, SpringLayout.EAST, mainFrame.getContentPane());
 		
-		// adding Start button
-		Start = new JButton();
-		Start.setText("Start ");
-		Start.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				
-			}
-		});
-		Start.setFocusable(false);
-		Start.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		Readings_panel.add(Start);
-		
 		// adding connect button and drop down for selecting port
 		portList = new JComboBox<String>();
-		String[] ports = SerialNetwork.getCommPorts() ;
-		for (int p =0; p < ports.length; p++) {
-			portList.addItem(ports[p]);
-		}
+		addCommPorts();
 		
 		// adding button to refresh the available comm ports
 		R = new JButton(" R ");
 		R.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent arg0) {
-			
+			portList.removeAllItems();
+			addCommPorts();
+
 		}
 			});
 		R.setFocusable(false);
@@ -156,7 +147,22 @@ public class DisplayFrame
 		});
 		Disconnect.setFocusable(false);
 		Disconnect.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		Disconnect.setEnabled(false);
 		Readings_panel.add(Disconnect);
+
+		
+		// adding Start button
+		Start = new JButton();
+		Start.setText("Start ");
+		Start.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				actionStart();
+			}
+		});
+		Start.setFocusable(false);
+		Start.setEnabled(false);
+		Start.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		Readings_panel.add(Start);		
 				
 		// adding readings label and title
 		JLabel readingLbl1 = new JLabel("SpO2(%):");
@@ -201,11 +207,11 @@ public class DisplayFrame
 		});
 		plotGraph.setFocusable(false);
 		plotGraph.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		plotGraph.setEnabled(false);
 		Readings_panel.add(plotGraph);
 		
 		clearGraph = new JButton();
 		clearGraph.setText("Clear Graph ");
-		clearGraph.setHorizontalAlignment(SwingConstants.RIGHT);
 		clearGraph.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				plotEnable = false;
@@ -215,8 +221,22 @@ public class DisplayFrame
 		});
 		clearGraph.setFocusable(false);
 		clearGraph.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		clearGraph.setEnabled(false);
 		Readings_panel.add(clearGraph);
 
+		saveGraph = new JButton();
+		saveGraph.setText("Save Graph ");
+		saveGraph.setHorizontalAlignment(SwingConstants.RIGHT);
+		saveGraph.setEnabled(false);
+		saveGraph.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				saveChart();
+			}
+		});
+		saveGraph.setFocusable(false);
+		saveGraph.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		Readings_panel.add(saveGraph);
+		
 		mainFrame.getContentPane().add(Readings_panel);
 		
 		//adding scroll pane
@@ -295,6 +315,13 @@ public class DisplayFrame
         Pb_Ready = false;
 	}
 	
+	public void addCommPorts() {
+		String[] ports = SerialNetwork.getCommPorts() ;
+		for (int p =0; p < ports.length; p++) {
+			portList.addItem(ports[p]);
+		}
+	}
+	
 	//making function for displaying value
 	public void displayReading(int spo2, int bpm, int ppg) {
 	
@@ -311,9 +338,13 @@ public class DisplayFrame
 		trace.setColor(Color.RED);
 		IAxis axisX = chart.getAxisX();
 	    axisX.setPaintGrid(true);
+	    axisX.getAxisTitle().setTitle("Time (s)");
 	    IAxis axisY = chart.getAxisY();
 	    axisY.setPaintGrid(true);
+	    axisY.getAxisTitle().setTitle("Heart Rate");
+
 		chart.addTrace(trace);
+		trace.setName("Graph for Heart Rate");
 		
 		graphPanel.setLayout(new BorderLayout(0, 0));
 		graphPanel.add(chart);
@@ -327,10 +358,10 @@ public class DisplayFrame
 		trace.addPoint(xaxis, yaxis);
 	}
 	
-	private void clearChart() {
+		private void clearChart() {
 		i=0;
 		trace.removeAllPoints();
-		//trace.addPoint(0, 0);
+		saveGraph.setEnabled(false);;
 		
 	}
 	
@@ -339,6 +370,11 @@ public class DisplayFrame
 		if (checkConnect) {
 			String c = "Connected to " + SerialNetwork.getConnectionName();
 			printTextWin(c,1,true);
+			Disconnect.setEnabled(true);
+			Start.setEnabled(true);
+			Connect.setEnabled(false);
+			R.setEnabled(false);
+			portList.setEnabled(false);
 		}
 		else {
 			String f = "Connection failed" ;
@@ -351,7 +387,42 @@ public class DisplayFrame
 		SerialNetwork.disconnectPort();
 		String d = "\n" + name + " Disconnected";
 		printTextWin(d,1,true);
+		Connect.setEnabled(true);
+		Disconnect.setEnabled(false);
+		plotGraph.setEnabled(false);
+		clearGraph.setEnabled(false);
+		Start.setEnabled(false);
+		R.setEnabled(true);
+		portList.setEnabled(true);
+		spo2Field.setText("");
+		bpmField.setText("");
+		ppgField.setText("");
+
 	}
+	
+	private void actionStart() {
+		
+		plotGraph.setEnabled(true);
+		clearGraph.setEnabled(true);
+		
+	}
+	
+	private void saveChart() {
+		 Runtime.getRuntime().addShutdownHook(new Thread() {
+	            public void run() {
+	                // save the chart to a file
+	                try {
+	                    BufferedImage bi = chart.snapShot();
+	                    ImageIO.write(bi, "JPEG", new File("Graph.jpg"));
+	                    printTextWin("\n Graph Saved ", 1, true);
+	                    System.out.println("\n Graph Saved  \n ");
+	                    // other possible file formats are PNG and BMP
+	                } catch (Exception ex) {
+	                    System.err.println("Error saving Graph to File: "+ex.getMessage());
+	                }
+	            }
+	        });
+		}
 	
 	private void printTextWin(String t, int tstyle, boolean newline) {
 		try {
@@ -436,6 +507,7 @@ public class DisplayFrame
 
 
 	//a method for updating all values of GUI
+
 	public void updateDynamic() {
 		
 		String  recv_s;
@@ -466,6 +538,7 @@ public class DisplayFrame
     	        		Pb_Ready = true;
     	        		Pb_NValues = 0;
     	        		plotEnable = false;
+    	        		saveGraph.setEnabled(true);
     				}
     				else {
     					Pb_NValues++;
