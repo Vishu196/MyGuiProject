@@ -19,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -354,8 +355,8 @@ public class DisplayFrame
 		graphPanel.repaint();
 		
 	}
-	private void plotChart(int xaxis, int yaxis) {	
-		trace.addPoint(xaxis, yaxis);
+	private void plotChart(int xvalue, int yvalue) {	
+		trace.addPoint(xvalue, yvalue);
 	}
 	
 		private void clearChart() {
@@ -397,13 +398,15 @@ public class DisplayFrame
 		spo2Field.setText("");
 		bpmField.setText("");
 		ppgField.setText("");
-
+		clearChart();
 	}
 	
 	private void actionStart() {
 		
 		plotGraph.setEnabled(true);
 		clearGraph.setEnabled(true);
+		Start.setEnabled(false);
+		sendPacket(SerialNetwork.pType_start);
 		
 	}
 	
@@ -414,6 +417,7 @@ public class DisplayFrame
 	                try {
 	                    BufferedImage bi = chart.snapShot();
 	                    ImageIO.write(bi, "JPEG", new File("Graph.jpg"));
+	                    JOptionPane.showMessageDialog(mainFrame, "Graph Saved");
 	                    printTextWin("\n Graph Saved ", 1, true);
 	                    System.out.println("\n Graph Saved  \n ");
 	                    // other possible file formats are PNG and BMP
@@ -504,7 +508,82 @@ public class DisplayFrame
 		}
 	}
 	
+	
+public void updateDynamic1() {
+		
+		byte[] rData ;
+    	String  splits[];
+    	int  k;
+    	
+    	while ((rData = SerialNetwork.recvSerial()) != SerialNetwork.error) {
+				System.out.println("["+ rData + "]");
+				
+			try {
+				byte pType = rData[0];
+				switch(pType) {
+				
+				case SerialNetwork.pType_startSuccess:
+					sendPacket(SerialNetwork.pType_sendData);
+					break;
+					
+				case SerialNetwork.pType_startFail:
+					sendPacket(SerialNetwork.pType_start);
+					break;
 
+				case SerialNetwork.pType_data:
+					processData(rData);
+					break;
+					
+				case SerialNetwork.pType_stopOk:
+					
+					break;
+
+				case SerialNetwork.pType_error:
+					
+					break;
+
+
+				}
+
+				
+			} catch  (NumberFormatException e) {
+		        System.out.println(e.toString());
+		    }
+    	}
+   	}
+
+	private void processData(byte[] data) {
+	
+		if(data.length <= NCOLS) {
+    		System.out.print("processData: Data Insufficient");
+			return;
+		}
+		
+		int spo2 = data[1];
+		int bpm = data[2];
+		int ppg = data[3];
+		
+		displayReading(spo2, bpm, ppg);
+		
+		if(plotEnable) {
+			plotChart(Pb_NValues,);
+		}
+	}
+
+	static void sendPacket(byte pType) {
+	
+		byte[] sendData = new byte[6];
+		int sendDatalength = 1;
+		
+		sendData[0] = SerialNetwork.startByte;
+		sendData[1] = (byte)sendDatalength;
+		sendData[2] = pType;
+		sendData[3] = 1;
+		sendData[4] = (byte) (pType^1);
+		sendData[5] = SerialNetwork.stopByte;
+		SerialNetwork.sendData(sendData, sendData.length);
+	
+		}
 
 	//a method for updating all values of GUI
 

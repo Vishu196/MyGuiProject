@@ -9,6 +9,19 @@ public class SerialNetwork {
 	static SerialPort mPort;
 	static private String mPortName = null;
 	
+	 //defining protocol constants
+	public static byte startByte = 0x24;             // $ for start
+	public static byte stopByte = 0x23;			 // # for stop
+	public static final byte pType_start = 0x25;
+	public static final byte pType_startSuccess = 0x26;
+	public static final byte pType_startFail = 0x27;
+	public static final byte pType_sendData = 0x28;
+	public static final byte pType_data = 0x29;
+	public static final byte pType_stopData = 0x30;
+	public static final byte pType_stopOk = 0x31;
+	public static final byte pType_error = 0x32;
+	public static final byte[] error = {(byte) 0xff};
+	
 	
 	static void initSerialNet () {
 		
@@ -64,6 +77,52 @@ public class SerialNetwork {
 		return mPortName;
 	}
 	
+	static byte[] recvSerial() {
+		
+		int minBytes = 5;
+		long bytesToRead = 1;
+		byte[] temp = new byte[1];
+		byte[] crc = new byte[1];
+		crc[0] = 0x00;
+		
+		
+	
+		/* check if min bytes are available for reading*/
+		if(mPort.bytesAvailable() <= minBytes) {
+			return error; 
+		}
+		
+		/*read the first byte, check if it is startByte*/
+		mPort.readBytes(temp,bytesToRead); 
+		if (temp[0] != startByte) {
+			return error;						/*if first byte is not startByte, return error*/
+		}
+		
+		mPort.readBytes(temp,bytesToRead); 
+		bytesToRead = temp[0];
+		byte[] data = new byte[(int) bytesToRead];
+		
+		mPort.readBytes(data, bytesToRead);
+		for (int i = 0; i < data.length; i++) {
+		crc[0] = (byte) (crc[0] ^ data[i]);
+		}
+		
+		bytesToRead = 1;
+		mPort.readBytes(temp, bytesToRead);
+		if (temp[0] != crc[0]) {
+			return error;						/*if first byte is not startByte, return error*/
+		}
+		
+		mPort.readBytes(temp, bytesToRead);
+		if (temp[0] != stopByte) {
+			return error;						/*if first byte is not startByte, return error*/
+		}
+		
+		return data;
+	}
+	
+	
+	
 	static String ReadString() {
     	String  recv_str;
         byte[] d_arr = new byte[32];
@@ -112,4 +171,11 @@ public class SerialNetwork {
         }
         return recv_str;
     }
+
+	public static void sendData(byte[] sendData, int length) {
+		// TODO Auto-generated method stub
+		if(isConnected) {
+			mPort.writeBytes(sendData, length);
+		}
+	}
 }
