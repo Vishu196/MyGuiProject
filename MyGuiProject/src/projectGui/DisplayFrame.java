@@ -4,12 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-
 import javax.swing.Timer;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
@@ -329,7 +327,6 @@ public class DisplayFrame
 		spo2Field.setText(Integer.toString(spo2));
 		bpmField.setText(Integer.toString(bpm));
 		ppgField.setText(Integer.toString(ppg));
-
 	}
 	
 	private void createChart() {
@@ -355,16 +352,34 @@ public class DisplayFrame
 		graphPanel.repaint();
 		
 	}
+	
 	private void plotChart(int xvalue, int yvalue) {	
 		trace.addPoint(xvalue, yvalue);
 	}
 	
-		private void clearChart() {
-		i=0;
+	private void clearChart() {
 		trace.removeAllPoints();
+		trace.addPoint(0,0);
 		saveGraph.setEnabled(false);;
-		
 	}
+	
+	private void saveChart() {
+		 Runtime.getRuntime().addShutdownHook(new Thread() {
+	            public void run() {
+	                // save the chart to a file
+	                try {
+	                    BufferedImage bi = chart.snapShot();
+	                    ImageIO.write(bi, "JPEG", new File("Graph.jpg"));
+	                    JOptionPane.showMessageDialog(mainFrame, "Graph Saved");
+	                    printTextWin("\n Graph Saved ", 1, true);
+	                    System.out.println("\n Graph Saved  \n ");
+	                    // other possible file formats are PNG and BMP
+	                } catch (Exception ex) {
+	                    System.err.println("Error saving Graph to File: "+ex.getMessage());
+	                }
+	            }
+	        });
+		}
 	
 	private void actionConnect() {
 		boolean checkConnect = SerialNetwork.connectPort(portList.getSelectedItem().toString());
@@ -407,26 +422,7 @@ public class DisplayFrame
 		clearGraph.setEnabled(true);
 		Start.setEnabled(false);
 		sendPacket(SerialNetwork.pType_start);
-		
 	}
-	
-	private void saveChart() {
-		 Runtime.getRuntime().addShutdownHook(new Thread() {
-	            public void run() {
-	                // save the chart to a file
-	                try {
-	                    BufferedImage bi = chart.snapShot();
-	                    ImageIO.write(bi, "JPEG", new File("Graph.jpg"));
-	                    JOptionPane.showMessageDialog(mainFrame, "Graph Saved");
-	                    printTextWin("\n Graph Saved ", 1, true);
-	                    System.out.println("\n Graph Saved  \n ");
-	                    // other possible file formats are PNG and BMP
-	                } catch (Exception ex) {
-	                    System.err.println("Error saving Graph to File: "+ex.getMessage());
-	                }
-	            }
-	        });
-		}
 	
 	private void printTextWin(String t, int tstyle, boolean newline) {
 		try {
@@ -449,19 +445,18 @@ public class DisplayFrame
             	break;
             default:
                 doc.remove(0, doc.getLength());
-        }
+            }
         if (tstyle >= 0) {
         	toutTextPane.setCharacterAttributes(TextSet, true);
         	if (newline) {
                 doc.insertString(doc.getLength(), t+"\n", TextSet);            		
         	} else {
                 doc.insertString(doc.getLength(), t, TextSet);
-        	}
-        }
-	}
+        		}
+        	}	
+		}
 		catch(BadLocationException ex) {
             System.out.println(ex.toString());
-			
 		}
 	}
 	
@@ -509,11 +504,9 @@ public class DisplayFrame
 	}
 	
 	
-public void updateDynamic1() {
+public void updateDynamic() {
 		
 		byte[] rData ;
-    	String  splits[];
-    	int  k;
     	
     	while ((rData = SerialNetwork.recvSerial()) != SerialNetwork.error) {
 				System.out.println("["+ rData + "]");
@@ -555,7 +548,7 @@ public void updateDynamic1() {
 	private void processData(byte[] data) {
 	
 		if(data.length <= NCOLS) {
-    		System.out.print("processData: Data Insufficient");
+    		System.out.printf("processData: Data Insufficient");
 			return;
 		}
 		
@@ -564,30 +557,42 @@ public void updateDynamic1() {
 		int ppg = data[3];
 		
 		displayReading(spo2, bpm, ppg);
+		System.out.printf("Values: %d %d %d\n", spo2,bpm,ppg);
 		
 		if(plotEnable) {
-			plotChart(Pb_NValues,);
+			plotChart(Pb_NValues,bpm);
+		}
+		if(Pb_NValues >= NROWS-1) {
+			printTextWin("\nDownload finished.", 1, true);
+    		Pb_Ready = true;
+    		Pb_NValues = 0;
+    		plotEnable = false;
+    		saveGraph.setEnabled(true);
+		}
+		else {
+			Pb_NValues++;
 		}
 	}
 
 	static void sendPacket(byte pType) {
 	
-		byte[] sendData = new byte[6];
+		byte[] sendData = new byte[5];
 		int sendDatalength = 1;
+		byte crc = 0x00;
+		
 		
 		sendData[0] = SerialNetwork.startByte;
 		sendData[1] = (byte)sendDatalength;
 		sendData[2] = pType;
-		sendData[3] = 1;
-		sendData[4] = (byte) (pType^1);
-		sendData[5] = SerialNetwork.stopByte;
+		sendData[3] = (byte) (crc^pType);
+		sendData[4] = SerialNetwork.stopByte;
+		
 		SerialNetwork.sendData(sendData, sendData.length);
-	
 		}
 
 	//a method for updating all values of GUI
 
-	public void updateDynamic() {
+	public void updateDynamic1() {
 		
 		String  recv_s;
     	String  splits[];

@@ -79,14 +79,16 @@ public class SerialNetwork {
 	
 	static byte[] recvSerial() {
 		
+		if(!isConnected) {
+			return error;
+		}
+		
 		int minBytes = 5;
 		long bytesToRead = 1;
 		byte[] temp = new byte[1];
 		byte[] crc = new byte[1];
 		crc[0] = 0x00;
 		
-		
-	
 		/* check if min bytes are available for reading*/
 		if(mPort.bytesAvailable() <= minBytes) {
 			return error; 
