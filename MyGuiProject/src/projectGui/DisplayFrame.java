@@ -198,10 +198,13 @@ public class DisplayFrame
 		plotGraph.setHorizontalAlignment(SwingConstants.RIGHT);
 		plotGraph.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-			
-				plotEnable = true;
-				Pb_NValues = 0;
-				Downl_Cnt = 0;
+				for(int i=0; i<NROWS; i++) {
+					plotChart(i,Plot_Buffer[i][1]);
+				}
+				saveGraph.setEnabled(true);
+				clearGraph.setEnabled(true);
+				Pb_Ready = false;
+				plotGraph.setEnabled(false);
 			}
 		});
 		plotGraph.setFocusable(false);
@@ -213,8 +216,9 @@ public class DisplayFrame
 		clearGraph.setText("Clear Graph ");
 		clearGraph.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				plotEnable = false;
+			
 				clearChart();
+				clearGraph.setEnabled(false);
 								
 			}
 		});
@@ -353,18 +357,20 @@ public class DisplayFrame
 		
 	}
 	
-	private void plotChart(int xvalue, int yvalue) {	
+	private void plotChart(int xvalue, double yvalue) {	
 		trace.addPoint(xvalue, yvalue);
 	}
 	
 	private void clearChart() {
 		trace.removeAllPoints();
 		trace.addPoint(0,0);
-		saveGraph.setEnabled(false);;
+		saveGraph.setEnabled(false);
+		Pb_Ready = false;
+		Start.setEnabled(true);
 	}
 	
 	private void saveChart() {
-		 Runtime.getRuntime().addShutdownHook(new Thread() {
+		 Thread t = new Thread() {
 	            public void run() {
 	                // save the chart to a file
 	                try {
@@ -378,7 +384,8 @@ public class DisplayFrame
 	                    System.err.println("Error saving Graph to File: "+ex.getMessage());
 	                }
 	            }
-	        });
+	        };
+	        t.start();
 		}
 	
 	private void actionConnect() {
@@ -387,10 +394,10 @@ public class DisplayFrame
 			String c = "Connected to " + SerialNetwork.getConnectionName();
 			printTextWin(c,1,true);
 			Disconnect.setEnabled(true);
-			Start.setEnabled(true);
 			Connect.setEnabled(false);
 			R.setEnabled(false);
 			portList.setEnabled(false);
+			Start.setEnabled(true);
 		}
 		else {
 			String f = "Connection failed" ;
@@ -418,8 +425,6 @@ public class DisplayFrame
 	
 	private void actionStart() {
 		
-		plotGraph.setEnabled(true);
-		clearGraph.setEnabled(true);
 		Start.setEnabled(false);
 		sendPacket(SerialNetwork.pType_start);
 	}
@@ -524,7 +529,14 @@ public void updateDynamic() {
 					break;
 
 				case SerialNetwork.pType_data:
+					System.out.println("PBNVALUE: " + Pb_NValues);
+					printTextWin("+", 1, false);
 					processData(rData);
+					Downl_Cnt++;
+					if (Downl_Cnt>25) {
+						Downl_Cnt = 0;
+						printTextWin(" ", 1, true);
+					}
 					break;
 					
 				case SerialNetwork.pType_stopOk:
@@ -552,22 +564,25 @@ public void updateDynamic() {
 			return;
 		}
 		
-		int spo2 = data[1];
-		int bpm = data[2];
-		int ppg = data[3];
+		int spo2 = (int)data[1];
+		int bpm = (int)data[2];
+		int ppg = (int)data[3];
 		
 		displayReading(spo2, bpm, ppg);
 		System.out.printf("Values: %d %d %d\n", spo2,bpm,ppg);
-		
-		if(plotEnable) {
-			plotChart(Pb_NValues,bpm);
+		if(!Pb_Ready) {
+			Plot_Buffer[Pb_NValues][0] = (double)spo2;
+			Plot_Buffer[Pb_NValues][1] = (double)bpm;
+			Plot_Buffer[Pb_NValues][2] = (double)ppg;
 		}
+		
+		
 		if(Pb_NValues >= NROWS-1) {
 			printTextWin("\nDownload finished.", 1, true);
+			plotGraph.setEnabled(true);
     		Pb_Ready = true;
     		Pb_NValues = 0;
-    		plotEnable = false;
-    		saveGraph.setEnabled(true);
+    		
 		}
 		else {
 			Pb_NValues++;
@@ -628,7 +643,7 @@ public void updateDynamic() {
     					Pb_NValues++;
     				}
     				  
-    				System.out.println("PBNVALUE: " + Pb_NValues);
+    				
 				} catch  (NumberFormatException e) {
 			        System.out.println(e.toString());
 			    }
@@ -646,7 +661,7 @@ public void updateDynamic() {
 	
 	static int Downl_Cnt;
     static boolean Pb_Ready;
-    static final int NROWS = 60, NCOLS = 3;
+    static final int NROWS = 50, NCOLS = 3;
     static double Plot_Buffer[][] = new double[NROWS][NCOLS];
     static int Pb_NValues;
     boolean plotEnable = false;

@@ -89,10 +89,9 @@ public class SerialNetwork {
 		byte[] crc = new byte[1];
 		crc[0] = 0x00;
 		
-		System.out.printf("BytesAvailable:[%d] \n",mPort.bytesAvailable());
 		/* check if min bytes are available for reading*/
 		if(mPort.bytesAvailable() < minBytes) {
-			System.out.printf("minBytes not available: Error\n");
+			System.out.printf("minBytes not available\n");
 			return error; 
 			
 		}
@@ -100,7 +99,7 @@ public class SerialNetwork {
 		/*read the first byte, check if it is startByte*/
 		mPort.readBytes(temp,bytesToRead); 
 		if (temp[0] != startByte) {
-			System.out.printf("StartByte:[0x%X] \n", temp[0]);
+			System.out.printf("ErrorByte:[0x%X] \n", temp[0]);
 			return error;						/*if first byte is not startByte, return error*/
 		}
 		
@@ -109,19 +108,23 @@ public class SerialNetwork {
 		byte[] data = new byte[(int) bytesToRead];
 		
 		mPort.readBytes(data, bytesToRead);
-		System.out.printf("data:[%s] \n", data);
-		for (int i = 0; i < data.length; i++) {
-		crc[0] = (byte) (crc[0] ^ data[i]);
+		
+		System.out.printf("data:");
+		for (int i = 0; i < bytesToRead; i++) {
+			System.out.printf("0x%X,", data[i]);
+			crc[0] = (byte) (crc[0] ^ data[i]);
 		}
 		
 		bytesToRead = 1;
 		mPort.readBytes(temp, bytesToRead);
 		if (temp[0] != crc[0]) {
+			System.out.printf("CRC check failed \n");
 			return error;						/*if first byte is not startByte, return error*/
 		}
 		
 		mPort.readBytes(temp, bytesToRead);
 		if (temp[0] != stopByte) {
+			System.out.printf("Stopbyte check failed \n");
 			return error;						/*if first byte is not startByte, return error*/
 		}
 		
