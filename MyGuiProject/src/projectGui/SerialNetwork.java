@@ -5,7 +5,7 @@ import com.fazecast.jSerialComm.SerialPort;
 public class SerialNetwork {
 	
 	static final int nPortsMax = 10;
-	static private boolean isConnected = false;
+	static public boolean isConnected = false;
 	static SerialPort mPort;
 	static private String mPortName = null;
 	
@@ -133,54 +133,6 @@ public class SerialNetwork {
 	
 	
 	
-	static String ReadString() {
-    	String  recv_str;
-        byte[] d_arr = new byte[32];
-        int idx = 0;
-        int chunkSize = DisplayFrame.NCOLS * 2 + 1;
-        recv_str = null;
-        if (isConnected == true) {
-	        try {
-	            if ((mPort.bytesAvailable()) >= chunkSize) {
-	            	byte[] sof = new byte[1];
-	            	mPort.readBytes(sof, 1);
-	            	if(sof[0] != '$') {
-	            		return null;
-	            	}
-	            	d_arr[idx] = sof[0];
-	            	idx++;
-	            	mPort.readBytes(sof, 1);
-	            	if(sof[0] != ',') {
-	            		return null;
-	            	}
-	            	d_arr[idx] = sof[0];
-	            	idx++;
-	            	for(int i = 0;i<DisplayFrame.NCOLS; i++) {
-	            		mPort.readBytes(sof, 1);
-	            		while(sof[0] != ',') {
-		            		d_arr[idx] = sof[0];
-		            		idx++;
-		            		mPort.readBytes(sof, 1);
-		            	}
-		            	d_arr[idx] = ',';
-		            	idx++;
-	            	}
-	            	
-	            	for(int i = idx; i<32; i++) {
-	            		d_arr[idx] = 0x0;
-	            	}
-	            	//c_arr = new byte[chunkSize];
-	            	//mPort.readBytes(c_arr, chunkSize);
-	            	recv_str = new String(d_arr);
-		            System.out.printf("ReadString(): [%s] %d\n", d_arr, chunkSize);
-		            return recv_str;
-	            }
-	        } catch (Exception ex) {
-	        	System.out.println(ex.toString());
-	        }
-        }
-        return recv_str;
-    }
 
 	public static void sendData(byte[] sendData, int length) {
 		// TODO Auto-generated method stub

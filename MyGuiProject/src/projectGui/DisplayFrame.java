@@ -198,13 +198,7 @@ public class DisplayFrame
 		plotGraph.setHorizontalAlignment(SwingConstants.RIGHT);
 		plotGraph.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				for(int i=0; i<NROWS; i++) {
-					plotChart(i,Plot_Buffer[i][1]);
-				}
-				saveGraph.setEnabled(true);
-				clearGraph.setEnabled(true);
-				Pb_Ready = false;
-				plotGraph.setEnabled(false);
+				actionPlotGraph();
 			}
 		});
 		plotGraph.setFocusable(false);
@@ -216,9 +210,7 @@ public class DisplayFrame
 		clearGraph.setText("Clear Graph ");
 		clearGraph.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-			
-				clearChart();
-				clearGraph.setEnabled(false);
+				actionClearGraph();
 								
 			}
 		});
@@ -317,7 +309,7 @@ public class DisplayFrame
         Pb_NValues = 0;
         Pb_Ready = false;
 	}
-	
+
 	public void addCommPorts() {
 		String[] ports = SerialNetwork.getCommPorts() ;
 		for (int p =0; p < ports.length; p++) {
@@ -326,7 +318,7 @@ public class DisplayFrame
 	}
 	
 	//making function for displaying value
-	public void displayReading(int spo2, int bpm, int ppg) {
+	private void displayReading(int spo2, int bpm, int ppg) {
 	
 		spo2Field.setText(Integer.toString(spo2));
 		bpmField.setText(Integer.toString(bpm));
@@ -429,6 +421,23 @@ public class DisplayFrame
 		sendPacket(SerialNetwork.pType_start);
 	}
 	
+	private void actionPlotGraph() {
+		for(int i=0; i<NROWS; i++) {
+			plotChart(i,Plot_Buffer[i][1]);
+		}
+		saveGraph.setEnabled(true);
+		clearGraph.setEnabled(true);
+		Pb_Ready = false;
+		plotGraph.setEnabled(false);
+		
+	}
+	
+	private void actionClearGraph() {
+		clearChart();
+		clearGraph.setEnabled(false);
+	}
+
+	
 	private void printTextWin(String t, int tstyle, boolean newline) {
 		try {
 			Document doc = toutTextPane.getStyledDocument();
@@ -476,9 +485,12 @@ public class DisplayFrame
 		} else if (command.equals("help")) {
 			printTextWin("FPGA Control Help:", 1, true);
 			printTextWin("    clc - clear text window", 1, true);	
-			printTextWin("    clg - clear chart window", 1, true);				
 			printTextWin("    connect - connect", 1, true);			
-			printTextWin("    disconnect - disconnect", 1, true);			
+			printTextWin("    disconnect - disconnect", 1, true);	
+			printTextWin("    start - starts the sensor", 1, true);
+			printTextWin("    saveGr - saves the graph", 1, true);
+			printTextWin("    clearGr - clear chart window", 1, true);		
+			printTextWin("    exit - exit", 1, true);	
 			printTextWin("    .{sendstring}", 1, true);
 		} else if (command.startsWith("connect")) {
 			actionConnect();
@@ -491,13 +503,34 @@ public class DisplayFrame
 			}
 			displayUpdateTimer.stop();
 	        System.exit(0);
-		} else if (command.equals("downl")) {
-			
-			
-		} else if (command.startsWith("plot")) {
-			
-			
-		} else if (command.startsWith(".")) {
+		} else if (command.equals("start")) {
+			if(SerialNetwork.isConnected) {
+				actionStart();
+			}else {
+				printTextWin("*** Device not connected", 3, true);
+			}
+		}else if (command.startsWith("plot")) {
+			if(plotGraph.isEnabled()) {
+				actionPlotGraph();
+			}else {
+				printTextWin("*** Values not received", 3, true);
+			}
+		}else if (command.startsWith("saveGr")) {
+			if(saveGraph.isEnabled()) {
+					saveChart();
+			}else {
+					printTextWin("*** All Values not received", 3, true);
+				}
+		}else if (command.startsWith("clearGr")) {
+			if(clearGraph.isEnabled()) {
+				actionClearGraph();
+			}else {
+				printTextWin("*** Complete Graph not plotted", 3, true);
+			}
+		}else if (command.startsWith("clc")) {
+			toutTextPane.setText("");
+		}
+		else if (command.startsWith(".")) {
 			if (SerialNetwork.getConnectionName() != null) {
 				SerialNetwork.SendString(command.substring(1) + "\n");
 			} else {
@@ -506,10 +539,11 @@ public class DisplayFrame
 		} else if (command.length() > 0) {
 			printTextWin("*** command???: \"" + command + "\"", 3, true);
 		}
+		
 	}
 	
 	
-public void updateDynamic() {
+	public void updateDynamic() {
 		
 		byte[] rData ;
     	
@@ -595,7 +629,6 @@ public void updateDynamic() {
 		int sendDatalength = 1;
 		byte crc = 0x00;
 		
-		
 		sendData[0] = SerialNetwork.startByte;
 		sendData[1] = (byte)sendDatalength;
 		sendData[2] = pType;
@@ -605,66 +638,12 @@ public void updateDynamic() {
 		SerialNetwork.sendData(sendData, sendData.length);
 		}
 
-	//a method for updating all values of GUI
-
-	public void updateDynamic1() {
-		
-		String  recv_s;
-    	String  splits[];
-    	int  k;
-    	
-    	while ((recv_s = SerialNetwork.ReadString()) != null) {
-			// System.out.println("["+ recv_s + "]");
-    		if (recv_s.startsWith("$")) {
-        		printTextWin("+", 1, false);
-    			Downl_Cnt++;
-    			if (Downl_Cnt >= 25) {
-    				Downl_Cnt = 0;
-    				printTextWin("\n    ", 1, false);
-    			}
-				splits = recv_s.split(",");
-				try {
-    				for (k = 1; k < NCOLS + 1; k++) {
-    					Plot_Buffer[Pb_NValues][k-1] = (double)Integer.parseInt(splits[k]);
-    				}
-    				System.out.printf("Values: %d %d %d\n", (int) Plot_Buffer[Pb_NValues][0],(int) Plot_Buffer[Pb_NValues][1],(int) Plot_Buffer[Pb_NValues][2]);
-    				displayReading((int) Plot_Buffer[Pb_NValues][0],(int) Plot_Buffer[Pb_NValues][1],(int) Plot_Buffer[Pb_NValues][2]);		
-    				if(plotEnable) {
-    					plotChart(Pb_NValues, (int) Plot_Buffer[Pb_NValues][1]);
-    				}
-    				if(Pb_NValues >= NROWS-1) {
-    					printTextWin("\nDownload finished.", 1, true);
-    	        		Pb_Ready = true;
-    	        		Pb_NValues = 0;
-    	        		plotEnable = false;
-    	        		saveGraph.setEnabled(true);
-    				}
-    				else {
-    					Pb_NValues++;
-    				}
-    				  
-    				
-				} catch  (NumberFormatException e) {
-			        System.out.println(e.toString());
-			    }
-    			if (recv_s.startsWith("~")) {
-        			SerialNetwork.SendString("p\n");				
-    			}
-    		} else if (recv_s.startsWith("###")) {
-        		//printTextWin("\nDownload finished.", 1, true);
-        		//Pb_Ready = true;
-    		} else {
-        		printTextWin(recv_s, 0, true);    			
-    		}
-    	}
-	}
 	
 	static int Downl_Cnt;
     static boolean Pb_Ready;
     static final int NROWS = 50, NCOLS = 3;
     static double Plot_Buffer[][] = new double[NROWS][NCOLS];
     static int Pb_NValues;
-    boolean plotEnable = false;
 } 
 
 	
