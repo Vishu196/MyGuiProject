@@ -1,3 +1,12 @@
+/**
+* The DisplayFrame program implements an GUI application that
+* interfaces between PC and Micro controller.
+*
+* @author  Vaishnavi Shah
+* @version 1.0
+* @since   02-01-2023 
+*/
+
 package projectGui;
 
 import java.awt.BorderLayout;
@@ -37,7 +46,6 @@ import info.monitorenter.gui.chart.traces.Trace2DLtd;
 
 public class DisplayFrame 
 {
-	
 	private JFrame mainFrame;
 	private JTextField cmnd_Field, spo2Field,bpmField, ppgField;
 	private JComboBox<String> portList ;
@@ -72,15 +80,26 @@ public class DisplayFrame
 			}
 		});
 	}
-		
+
+/** Default Constructor 
+ * 	wherein the initialise function is called
+ */
 	public DisplayFrame() {
 		initialize();
 	}
 	
+/** Making a function to initialise i.e construct a main display frame for GUI
+ * @param mainFrame is the base frame that is divided into panels as per requirement
+ * A timer - displayUpdateTimer is started in the initialise functions soon as the frame is made, which checks for incoming 
+ * inputs in a forever loop.
+ */
+	
 	private void initialize() {
 		
-		//Making the frame for display, adding buttons and panels
-		
+		/** Create a main frame and setting required parameters
+		* using spring layout throughout the frame to organise the different panels created within
+		* using flow layout for arranging the components in Reading panel
+		*/
 		mainFrame = new JFrame();
 		mainFrame.setTitle("PulseOximeter 0.0.1");
 		mainFrame.setVisible(true);
@@ -89,7 +108,7 @@ public class DisplayFrame
 		SpringLayout springLayout =  new SpringLayout();
 		mainFrame.getContentPane().setLayout(springLayout);
 		
-		// adding command panel
+		// adding command panel and command text field
 		JPanel Cmnd_panel = new JPanel();
 		Cmnd_panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		FlowLayout flowLayout = (FlowLayout) Cmnd_panel.getLayout();
@@ -100,6 +119,21 @@ public class DisplayFrame
 		springLayout.putConstraint(SpringLayout.WEST, Cmnd_panel, 10, SpringLayout.WEST, mainFrame.getContentPane());
 		springLayout.putConstraint(SpringLayout.SOUTH, Cmnd_panel, -10, SpringLayout.SOUTH, mainFrame.getContentPane());
 		mainFrame.getContentPane().add(Cmnd_panel);
+		
+		JLabel lblNewLabel = new JLabel("Command: ");
+		lblNewLabel.setHorizontalAlignment(SwingConstants.LEFT);
+		Cmnd_panel.add(lblNewLabel);
+		
+		cmnd_Field = new JTextField();
+		cmnd_Field.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				CommandHandler(cmnd_Field.getText());
+				cmnd_Field.setText("");
+			}
+		});
+				
+		Cmnd_panel.add(cmnd_Field);
+		cmnd_Field.setColumns(60);
 		
 		// adding reading panel
 		JPanel Readings_panel = new JPanel();
@@ -113,7 +147,7 @@ public class DisplayFrame
 		springLayout.putConstraint(SpringLayout.WEST, Readings_panel, 10, SpringLayout.WEST, mainFrame.getContentPane());
 		springLayout.putConstraint(SpringLayout.EAST, Readings_panel, -10, SpringLayout.EAST, mainFrame.getContentPane());
 		
-		// adding connect button and drop down for selecting port
+		// adding drop down list for selecting port
 		portList = new JComboBox<String>();
 		addCommPorts();
 		
@@ -130,6 +164,7 @@ public class DisplayFrame
 		R.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		R.setBackground(Color.LIGHT_GRAY);
 		
+		// adding connect button and its action listener
 		Connect = new JButton("Connect ");
 		Connect.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent arg0) {
@@ -142,7 +177,7 @@ public class DisplayFrame
 		Readings_panel.add(R);
 		Readings_panel.add(Connect);
 		
-		// adding disconnect button
+		// adding disconnect button and its action listener
 		Disconnect = new JButton();
 		Disconnect.setText("Disconnect ");
 		Disconnect.addActionListener(new ActionListener() {
@@ -156,7 +191,7 @@ public class DisplayFrame
 		Readings_panel.add(Disconnect);
 
 		
-		// adding Start button
+		// adding Start button and its action listener
 		Start = new JButton();
 		Start.setText("Start ");
 		Start.addActionListener(new ActionListener() {
@@ -169,7 +204,7 @@ public class DisplayFrame
 		Start.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		Readings_panel.add(Start);		
 				
-		// adding readings label and title
+		// adding readings label and title and its action listener
 		JLabel readingLbl1 = new JLabel("SpO2(%):");
 		Readings_panel.add(readingLbl1);
 		spo2Field = new JTextField();
@@ -198,7 +233,7 @@ public class DisplayFrame
 		ppgField.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		ppgField.setBackground(Color.WHITE);
 		
-		// adding graph button
+		// adding Plot graph button and its action listener
 		plotGraph = new JButton();
 		plotGraph.setText("Plot Graph ");
 		plotGraph.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -212,6 +247,7 @@ public class DisplayFrame
 		plotGraph.setEnabled(false);
 		Readings_panel.add(plotGraph);
 		
+		// adding Clear graph button and its action listener
 		clearGraph = new JButton();
 		clearGraph.setText("Clear Graph ");
 		clearGraph.addActionListener(new ActionListener() {
@@ -225,6 +261,7 @@ public class DisplayFrame
 		clearGraph.setEnabled(false);
 		Readings_panel.add(clearGraph);
 
+		// adding save button and its action listener
 		save = new JButton();
 		save.setText("Save ");
 		save.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -247,23 +284,9 @@ public class DisplayFrame
 		springLayout.putConstraint(SpringLayout.EAST, scrollPane, 250, SpringLayout.WEST, mainFrame.getContentPane());
 		springLayout.putConstraint(SpringLayout.NORTH, scrollPane, 50, SpringLayout.NORTH, mainFrame.getContentPane());
 		springLayout.putConstraint(SpringLayout.WEST, scrollPane, 10, SpringLayout.WEST, mainFrame.getContentPane());
-		
-		JLabel lblNewLabel = new JLabel("Command: ");
-		lblNewLabel.setHorizontalAlignment(SwingConstants.LEFT);
-		Cmnd_panel.add(lblNewLabel);
-		
-		cmnd_Field = new JTextField();
-		cmnd_Field.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				CommandHandler(cmnd_Field.getText());
-				cmnd_Field.setText("");
-			}
-		});
-				
-		Cmnd_panel.add(cmnd_Field);
-		cmnd_Field.setColumns(60);
 		mainFrame.getContentPane().add(scrollPane);
 		
+		//adding graph panel
 		graphPanel = new JPanel();
 		graphPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		springLayout.putConstraint(SpringLayout.NORTH, graphPanel, 50, SpringLayout.NORTH, mainFrame.getContentPane());
@@ -271,12 +294,13 @@ public class DisplayFrame
 		springLayout.putConstraint(SpringLayout.SOUTH, graphPanel, -10, SpringLayout.NORTH, Cmnd_panel);
 		springLayout.putConstraint(SpringLayout.EAST, graphPanel, -10, SpringLayout.EAST, mainFrame.getContentPane());
 		
+		//adding Tout text pane
 		toutTextPane = new JTextPane();
 		toutTextPane.setEditable(false);
 		scrollPane.setViewportView(toutTextPane);
 		mainFrame.getContentPane().add(graphPanel);
 		
-		// adding menu bar and items 
+		// adding menu bar and items with action listener
 		JMenuBar menuBar = new JMenuBar();
 		mainFrame.setJMenuBar(menuBar);
 		
@@ -310,8 +334,10 @@ public class DisplayFrame
 			}
 		});
 		
+		// creating a blank chart with axis and labels to plot graph
 		createChart();
 		
+		//Creating a timer for updating in real time
 		displayUpdateTimer =  new Timer(250, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -325,6 +351,7 @@ public class DisplayFrame
         Pb_Ready = false;
 	}
 
+	// function to add available ports in drop down list
 	public void addCommPorts() {
 		String[] ports = SerialNetwork.getCommPorts() ;
 		for (int p =0; p < ports.length; p++) {
@@ -332,16 +359,15 @@ public class DisplayFrame
 		}
 	}
 	
-	//making function for displaying value
+	//function for displaying readings in Readings panel
 	private void displayReading(int spo2, int bpm, int ppg) {
-	
 		spo2Field.setText(Integer.toString(spo2));
 		bpmField.setText(Integer.toString(bpm));
 		ppgField.setText(Integer.toString(ppg));
 	}
 	
+	//function to create chart, adding it to graph panel and setting the required parameters
 	private void createChart() {
-		
 		chart = new Chart2D();
 		trace = new Trace2DLtd(numTraces);
 		trace.setColor(Color.RED);
@@ -361,13 +387,14 @@ public class DisplayFrame
 		chart.setSize(600, 500);
 		graphPanel.setVisible(true);
 		graphPanel.repaint();
-		
 	}
 	
+	//function to plot points on the chart
 	private void plotChart(int xvalue, double yvalue) {	
 		trace.addPoint(xvalue, yvalue);
 	}
 	
+	//function to clear Graph
 	private void clearChart() {
 		trace.removeAllPoints();
 		trace.addPoint(0,0);
@@ -376,6 +403,7 @@ public class DisplayFrame
 		Start.setEnabled(true);
 	}
 	
+	//function to save graph
 	private void saveChart() {
 		 Thread t = new Thread() {
 	            public void run() {
@@ -393,8 +421,30 @@ public class DisplayFrame
 	            }
 	        };
 	        t.start();
-		}
+	}
 	
+	//function to save readings in a file whose value is given in file string i.e. OutputFile
+	private void saveFile() {
+		Thread t = new Thread() {
+            public void run() {
+                // save the data to a file
+                try {
+                   Writer out = new OutputStreamWriter(new FileOutputStream(file));
+					for (int k = 0; k < NROWS; k++) {
+	                    out.write(String.format(Locale.ENGLISH, "%f %f %f \n",
+	                    	Plot_Buffer[k][0], Plot_Buffer[k][1],Plot_Buffer[k][2]));
+					}
+					out.close();
+				}
+				catch (Exception ex) {
+                    System.err.println("Error saving Data to File: "+ex.getMessage());
+                }
+            }
+        };
+        t.start();
+	}
+	
+	//function for action on Connect command
 	private void actionConnect() {
 		boolean checkConnect = SerialNetwork.connectPort(portList.getSelectedItem().toString());
 		if (checkConnect) {
@@ -412,6 +462,7 @@ public class DisplayFrame
 		}
 	}
 	
+	//function for action on disconnect command
 	private void actionDisconnect() {
 		String name = SerialNetwork.getConnectionName();
 		SerialNetwork.disconnectPort();
@@ -430,12 +481,13 @@ public class DisplayFrame
 		clearChart();
 	}
 	
+	//function for action on start command
 	private void actionStart() {
-		
 		Start.setEnabled(false);
 		sendPacket(SerialNetwork.pType_start);
 	}
 	
+	//function for action on Plot command
 	private void actionPlotGraph() {
 		for(int i=0; i<NROWS; i++) {
 			plotChart(i,Plot_Buffer[i][1]);
@@ -443,16 +495,16 @@ public class DisplayFrame
 		save.setEnabled(true);
 		clearGraph.setEnabled(true);
 		Pb_Ready = false;
-		plotGraph.setEnabled(false);
-		
+		plotGraph.setEnabled(false);	
 	}
 	
+	//function for action on clear graph command
 	private void actionClearGraph() {
 		clearChart();
 		clearGraph.setEnabled(false);
 	}
 
-	
+	//function to define the style of messages printed in the tout text pane
 	private void printTextWin(String t, int tstyle, boolean newline) {
 		try {
 			Document doc = toutTextPane.getStyledDocument();
@@ -489,6 +541,7 @@ public class DisplayFrame
 		}
 	}
 	
+	// function to define the action as per commands received in command field
 	private void CommandHandler(String cmds) {
 		String command = cmds, dev_name;
 		if (command.equals("clc")) {
@@ -554,6 +607,7 @@ public class DisplayFrame
 		}
 	}
 	
+	// function to define the action as per command received on serial communication
 	public void updateDynamic() {
 		byte[] rData ;
     	while ((rData = SerialNetwork.recvSerial()) != SerialNetwork.error) {
@@ -591,6 +645,7 @@ public class DisplayFrame
     	}
    	}
 
+	//function to process the data when Data packet is received
 	private void processData(byte[] data) {
 		if(data.length <= NCOLS) {
     		System.out.printf("processData: Data Insufficient");
@@ -617,31 +672,9 @@ public class DisplayFrame
 			Pb_NValues++;
 		}
 	}
-	
-	private void saveFile() {
-		Thread t = new Thread() {
-            public void run() {
-                // save the data to a file
-                try {
-                   Writer out = new OutputStreamWriter(new FileOutputStream(file));
-					for (int k = 0; k < NROWS; k++) {
-	                    out.write(String.format(Locale.ENGLISH, "%f %f %f \n",
-	                    	Plot_Buffer[k][0], Plot_Buffer[k][1],Plot_Buffer[k][2]));
-					}
-					out.close();
-				}
-				catch (Exception ex) {
-                    System.err.println("Error saving Data to File: "+ex.getMessage());
-                }
-            }
-        };
-        t.start();
-		
-		
-	}
 
+	// function to send data to serial port; defined by communication protocol
 	static void sendPacket(byte pType) {
-
 		byte[] sendData = new byte[5];
 		int sendDatalength = 1;
 		byte crc = 0x00;

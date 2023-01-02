@@ -1,3 +1,11 @@
+/**
+* The SerialNetwork program implements a code for connecting the GUI
+* with a Micro controller using UART communication protocol.
+*
+* @author  Vaishnavi Shah
+* @version 1.0
+* @since   02-01-2023 
+*/
 package projectGui;
 
 import com.fazecast.jSerialComm.SerialPort;
@@ -21,13 +29,8 @@ public class SerialNetwork {
 	public static final byte pType_stopOk = 0x31;
 	public static final byte pType_error = 0x32;
 	public static final byte[] error = {(byte) 0xff};
-	
-	
-	static void initSerialNet () {
 		
-		
-	}
-
+	// function to get available serial ports and return the names
 	static String[] getCommPorts() {
 		SerialPort commPorts[] = SerialPort.getCommPorts();
 		int tPorts = commPorts.length;
@@ -36,9 +39,9 @@ public class SerialNetwork {
 			portNames[i] = commPorts[i].getSystemPortName();
 		}
 		return portNames;
-		
 	}
 	
+	//function to connect a given port to GUI 
 	static boolean connectPort(String portName) {
 		try {
 			mPort = SerialPort.getCommPort(portName);
@@ -57,14 +60,8 @@ public class SerialNetwork {
 		}
 		return isConnected;
 	}
-	 
-	static void SendString(String tstr) {
-	        if (isConnected == true) {
-	            mPort.writeBytes(tstr.getBytes(), tstr.length());
-	        }
-	    }
 
-	
+	//function to disconnect the port
 	static void disconnectPort() {
 		if (isConnected == true) {
 			mPort.closePort();
@@ -73,16 +70,16 @@ public class SerialNetwork {
 		}
 	}
 	
+	//function to return the name of connected port
 	static String getConnectionName() {
 		return mPortName;
 	}
 	
+	// function for action when command is received on port and return data array containing packet type and readings 
 	static byte[] recvSerial() {
-		
-		if(!isConnected) {
+			if(!isConnected) {
 			return error;
 		}
-		
 		int minBytes = 5;
 		long bytesToRead = 1;
 		byte[] temp = new byte[1];
@@ -92,8 +89,7 @@ public class SerialNetwork {
 		/* check if min bytes are available for reading*/
 		if(mPort.bytesAvailable() < minBytes) {
 			System.out.printf("minBytes not available\n");
-			return error; 
-			
+			return error; 		
 		}
 		
 		/*read the first byte, check if it is startByte*/
@@ -108,7 +104,6 @@ public class SerialNetwork {
 		byte[] data = new byte[(int) bytesToRead];
 		
 		mPort.readBytes(data, bytesToRead);
-		
 		System.out.printf("data:");
 		for (int i = 0; i < bytesToRead; i++) {
 			System.out.printf("0x%X,", data[i]);
@@ -131,11 +126,9 @@ public class SerialNetwork {
 		return data;
 	}
 	
-	
-	
-
+	//function to write command on serial port.
+	// we have to pass the command and length of command to function as parameters
 	public static void sendData(byte[] sendData, int length) {
-		// TODO Auto-generated method stub
 		if(isConnected) {
 			mPort.writeBytes(sendData, length);
 		}
