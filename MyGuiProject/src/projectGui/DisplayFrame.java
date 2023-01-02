@@ -389,7 +389,7 @@ public class DisplayFrame
 		graphPanel.repaint();
 	}
 	
-	//function to plot points on the chart
+	//function to plot point at x,y on the chart; we have to pass value of x & y as parameter
 	private void plotChart(int xvalue, double yvalue) {	
 		trace.addPoint(xvalue, yvalue);
 	}
@@ -645,7 +645,7 @@ public class DisplayFrame
     	}
    	}
 
-	//function to process the data when Data packet is received
+	//function to process the data when Data packet is received; we have to pass the received data as parameter
 	private void processData(byte[] data) {
 		if(data.length <= NCOLS) {
     		System.out.printf("processData: Data Insufficient");
@@ -674,6 +674,7 @@ public class DisplayFrame
 	}
 
 	// function to send data to serial port; defined by communication protocol
+	// we have to pass packet type as parameter
 	static void sendPacket(byte pType) {
 		byte[] sendData = new byte[5];
 		int sendDatalength = 1;
