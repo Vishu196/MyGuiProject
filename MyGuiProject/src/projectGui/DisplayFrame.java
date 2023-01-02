@@ -7,7 +7,8 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.*;
+import java.util.Locale;
 import javax.swing.Timer;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
@@ -40,7 +41,7 @@ public class DisplayFrame
 	private JFrame mainFrame;
 	private JTextField cmnd_Field, spo2Field,bpmField, ppgField;
 	private JComboBox<String> portList ;
-	private JButton Start, Connect, R, Disconnect, plotGraph, clearGraph, saveGraph;
+	private JButton Start, Connect, R, Disconnect, plotGraph, clearGraph, save;
 	private JPanel graphPanel;
 	private JTextPane toutTextPane;
 	private Timer displayUpdateTimer;
@@ -50,7 +51,12 @@ public class DisplayFrame
 	private ITrace2D trace;
     private int numTraces = 50;
     private SimpleAttributeSet TextSet = new SimpleAttributeSet();
-
+    static int Downl_Cnt;
+    static boolean Pb_Ready;
+    static final int NROWS = 50, NCOLS = 3;
+    static double Plot_Buffer[][] = new double[NROWS][NCOLS];
+    static int Pb_NValues;
+    private String file = "OutputFile";
 	
 	public static void main(String[] args) {
 		
@@ -219,18 +225,19 @@ public class DisplayFrame
 		clearGraph.setEnabled(false);
 		Readings_panel.add(clearGraph);
 
-		saveGraph = new JButton();
-		saveGraph.setText("Save Graph ");
-		saveGraph.setHorizontalAlignment(SwingConstants.RIGHT);
-		saveGraph.setEnabled(false);
-		saveGraph.addActionListener(new ActionListener() {
+		save = new JButton();
+		save.setText("Save ");
+		save.setHorizontalAlignment(SwingConstants.RIGHT);
+		save.setEnabled(false);
+		save.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				saveChart();
+				saveFile();
 			}
 		});
-		saveGraph.setFocusable(false);
-		saveGraph.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		Readings_panel.add(saveGraph);
+		save.setFocusable(false);
+		save.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		Readings_panel.add(save);
 		
 		mainFrame.getContentPane().add(Readings_panel);
 		
@@ -279,18 +286,20 @@ public class DisplayFrame
 		JMenu mnNewMenu1 = new JMenu("Options");
 		menuBar.add(mnNewMenu1);
 		
-		JMenuItem mnNewMenuItem = new JMenuItem("New");
 		JMenuItem mnNewMenuItem1 = new JMenuItem("Save");
-		mnNewMenu.add(mnNewMenuItem);
 		mnNewMenu.add(mnNewMenuItem1);
+		mnNewMenuItem1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				saveChart();
+			}
+		});
 		
-		
-		JMenuItem mnNewMenu1Item2 = new JMenuItem("Exit");
-		mnNewMenu1.add(mnNewMenu1Item2);
-		mnNewMenu1Item2.addActionListener(new ActionListener() {
+		JMenuItem mnNewMenu1Item1 = new JMenuItem("Exit");
+		mnNewMenu1.add(mnNewMenu1Item1);
+		mnNewMenu1Item1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				SerialNetwork.disconnectPort();
-		      //  DispUpdate_Timer.stop();
+				displayUpdateTimer.stop();
 		        System.exit(0);
 			}
 		});
@@ -356,7 +365,7 @@ public class DisplayFrame
 	private void clearChart() {
 		trace.removeAllPoints();
 		trace.addPoint(0,0);
-		saveGraph.setEnabled(false);
+		save.setEnabled(false);
 		Pb_Ready = false;
 		Start.setEnabled(true);
 	}
@@ -368,8 +377,8 @@ public class DisplayFrame
 	                try {
 	                    BufferedImage bi = chart.snapShot();
 	                    ImageIO.write(bi, "JPEG", new File("Graph.jpg"));
-	                    JOptionPane.showMessageDialog(mainFrame, "Graph Saved");
-	                    printTextWin("\n Graph Saved ", 1, true);
+	                    JOptionPane.showMessageDialog(mainFrame, "Graph and Data Saved");
+	                    printTextWin("\n Graph and Data Saved ", 1, true);
 	                    System.out.println("\n Graph Saved  \n ");
 	                    // other possible file formats are PNG and BMP
 	                } catch (Exception ex) {
@@ -425,7 +434,7 @@ public class DisplayFrame
 		for(int i=0; i<NROWS; i++) {
 			plotChart(i,Plot_Buffer[i][1]);
 		}
-		saveGraph.setEnabled(true);
+		save.setEnabled(true);
 		clearGraph.setEnabled(true);
 		Pb_Ready = false;
 		plotGraph.setEnabled(false);
@@ -476,8 +485,6 @@ public class DisplayFrame
 	
 	private void CommandHandler(String cmds) {
 		String command = cmds, dev_name;
-	
-
 		if (command.equals("clc")) {
 			toutTextPane.setText("");
 		} else if (command.equals("clg")) {
@@ -516,7 +523,7 @@ public class DisplayFrame
 				printTextWin("*** Values not received", 3, true);
 			}
 		}else if (command.startsWith("saveGr")) {
-			if(saveGraph.isEnabled()) {
+			if(save.isEnabled()) {
 					saveChart();
 			}else {
 					printTextWin("*** All Values not received", 3, true);
@@ -539,21 +546,16 @@ public class DisplayFrame
 		} else if (command.length() > 0) {
 			printTextWin("*** command???: \"" + command + "\"", 3, true);
 		}
-		
 	}
 	
-	
 	public void updateDynamic() {
-		
 		byte[] rData ;
-    	
     	while ((rData = SerialNetwork.recvSerial()) != SerialNetwork.error) {
 				System.out.println("["+ rData + "]");
-				
 			try {
 				byte pType = rData[0];
-				switch(pType) {
-				
+				switch(pType) 
+				{
 				case SerialNetwork.pType_startSuccess:
 					sendPacket(SerialNetwork.pType_sendData);
 					break;
@@ -572,32 +574,22 @@ public class DisplayFrame
 						printTextWin(" ", 1, true);
 					}
 					break;
-					
-				case SerialNetwork.pType_stopOk:
-					
-					break;
 
 				case SerialNetwork.pType_error:
-					
 					break;
-
-
 				}
-
-				
-			} catch  (NumberFormatException e) {
+			}
+			catch  (NumberFormatException e) {
 		        System.out.println(e.toString());
 		    }
     	}
    	}
 
 	private void processData(byte[] data) {
-	
 		if(data.length <= NCOLS) {
     		System.out.printf("processData: Data Insufficient");
 			return;
 		}
-		
 		int spo2 = (int)data[1];
 		int bpm = (int)data[2];
 		int ppg = (int)data[3];
@@ -609,22 +601,41 @@ public class DisplayFrame
 			Plot_Buffer[Pb_NValues][1] = (double)bpm;
 			Plot_Buffer[Pb_NValues][2] = (double)ppg;
 		}
-		
-		
 		if(Pb_NValues >= NROWS-1) {
 			printTextWin("\nDownload finished.", 1, true);
 			plotGraph.setEnabled(true);
     		Pb_Ready = true;
-    		Pb_NValues = 0;
-    		
+    		Pb_NValues = 0;	
 		}
 		else {
 			Pb_NValues++;
 		}
 	}
+	
+	private void saveFile() {
+		Thread t = new Thread() {
+            public void run() {
+                // save the data to a file
+                try {
+                   Writer out = new OutputStreamWriter(new FileOutputStream(file));
+					for (int k = 0; k < NROWS; k++) {
+	                    out.write(String.format(Locale.ENGLISH, "%f %f %f \n",
+	                    	Plot_Buffer[k][0], Plot_Buffer[k][1],Plot_Buffer[k][2]));
+					}
+					out.close();
+				}
+				catch (Exception ex) {
+                    System.err.println("Error saving Data to File: "+ex.getMessage());
+                }
+            }
+        };
+        t.start();
+		
+		
+	}
 
 	static void sendPacket(byte pType) {
-	
+
 		byte[] sendData = new byte[5];
 		int sendDatalength = 1;
 		byte crc = 0x00;
@@ -634,17 +645,13 @@ public class DisplayFrame
 		sendData[2] = pType;
 		sendData[3] = (byte) (crc^pType);
 		sendData[4] = SerialNetwork.stopByte;
-		
 		SerialNetwork.sendData(sendData, sendData.length);
 		}
 
 	
-	static int Downl_Cnt;
-    static boolean Pb_Ready;
-    static final int NROWS = 50, NCOLS = 3;
-    static double Plot_Buffer[][] = new double[NROWS][NCOLS];
-    static int Pb_NValues;
+	
 } 
+		
 
 	
 
