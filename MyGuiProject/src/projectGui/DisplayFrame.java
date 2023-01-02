@@ -82,7 +82,7 @@ public class DisplayFrame
 		//Making the frame for display, adding buttons and panels
 		
 		mainFrame = new JFrame();
-		mainFrame.setTitle("Pulseoximeter GUI");
+		mainFrame.setTitle("PulseOximeter 0.0.1");
 		mainFrame.setVisible(true);
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setBounds(100, 100, 930, 600);
@@ -290,7 +290,13 @@ public class DisplayFrame
 		mnNewMenu.add(mnNewMenuItem1);
 		mnNewMenuItem1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				saveChart();
+				if(save.isEnabled()) {
+					saveChart();
+					saveFile();
+				} else {
+					printTextWin(" \n *** Cannot Save Data ***", 3, true);
+				}
+				
 			}
 		});
 		
@@ -493,12 +499,13 @@ public class DisplayFrame
 			printTextWin("FPGA Control Help:", 1, true);
 			printTextWin("    clc - clear text window", 1, true);	
 			printTextWin("    connect - connect", 1, true);			
-			printTextWin("    disconnect - disconnect", 1, true);	
+			printTextWin("    disconnect - disconnect", 1, true);
+			printTextWin("    plot - plots the graph", 1, true);	
 			printTextWin("    start - starts the sensor", 1, true);
 			printTextWin("    saveGr - saves the graph", 1, true);
+			printTextWin("    saveFile - saves the data to file", 1, true);
 			printTextWin("    clearGr - clear chart window", 1, true);		
 			printTextWin("    exit - exit", 1, true);	
-			printTextWin("    .{sendstring}", 1, true);
 		} else if (command.startsWith("connect")) {
 			actionConnect();
 		} else if (command.equals("disconnect")) {
@@ -514,37 +521,36 @@ public class DisplayFrame
 			if(SerialNetwork.isConnected) {
 				actionStart();
 			}else {
-				printTextWin("*** Device not connected", 3, true);
+				printTextWin("\n  *** Device not connected***", 3, true);
 			}
 		}else if (command.startsWith("plot")) {
 			if(plotGraph.isEnabled()) {
 				actionPlotGraph();
 			}else {
-				printTextWin("*** Values not received", 3, true);
+				printTextWin("\n  *** Values not received***", 3, true);
 			}
 		}else if (command.startsWith("saveGr")) {
 			if(save.isEnabled()) {
 					saveChart();
 			}else {
-					printTextWin("*** All Values not received", 3, true);
+					printTextWin("\n  *** All Values not received***", 3, true);
 				}
 		}else if (command.startsWith("clearGr")) {
 			if(clearGraph.isEnabled()) {
 				actionClearGraph();
 			}else {
-				printTextWin("*** Complete Graph not plotted", 3, true);
+				printTextWin("\n  *** Complete Graph not plotted***", 3, true);
 			}
+		}else if (command.startsWith("saveFile")) {
+				if(save.isEnabled()) {
+					saveFile();
+				}else {
+					printTextWin("\n  *** All Values not received***", 3, true);
+				}
 		}else if (command.startsWith("clc")) {
 			toutTextPane.setText("");
-		}
-		else if (command.startsWith(".")) {
-			if (SerialNetwork.getConnectionName() != null) {
-				SerialNetwork.SendString(command.substring(1) + "\n");
-			} else {
-				printTextWin("*** no connected device", 3, true);				
-			}
-		} else if (command.length() > 0) {
-			printTextWin("*** command???: \"" + command + "\"", 3, true);
+		}else if (command.length() > 0) {
+			printTextWin("\n   *** command???: \"" + command + "\"", 3, true);
 		}
 	}
 	
@@ -602,7 +608,7 @@ public class DisplayFrame
 			Plot_Buffer[Pb_NValues][2] = (double)ppg;
 		}
 		if(Pb_NValues >= NROWS-1) {
-			printTextWin("\nDownload finished.", 1, true);
+			printTextWin("\n Download finished.", 1, true);
 			plotGraph.setEnabled(true);
     		Pb_Ready = true;
     		Pb_NValues = 0;	
@@ -648,8 +654,6 @@ public class DisplayFrame
 		SerialNetwork.sendData(sendData, sendData.length);
 		}
 
-	
-	
 } 
 		
 
