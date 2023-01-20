@@ -43,6 +43,7 @@ import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
+import info.monitorenter.gui.chart.traces.Trace2DSimple;
 
 public class DisplayFrame 
 {
@@ -50,18 +51,20 @@ public class DisplayFrame
 	private JTextField cmnd_Field, spo2Field,bpmField, ppgField;
 	private JComboBox<String> portList ;
 	private JButton Start, Connect, R, Disconnect, plotGraph, clearGraph, save;
-	private JPanel graphPanel;
+	private JPanel graphPanel, graphPanel1, graphPanel2;
 	private JTextPane toutTextPane;
 	private Timer displayUpdateTimer;
 	public int var = 1;
 	public int i = 0;
-	static Chart2D chart;
-	private ITrace2D trace;
-    private int numTraces = 50;
+	static Chart2D chart, chart1, chart2;
+	static final int NTRACES = 3;
+    static ITrace2D mtraces[] = new ITrace2D[3];
+	private ITrace2D trace, trace1, trace2;
+    private int numTraces = 300;
     private SimpleAttributeSet TextSet = new SimpleAttributeSet();
     static int Downl_Cnt;
     static boolean Pb_Ready;
-    static final int NROWS = 50, NCOLS = 3;
+    static final int NROWS = 300, NCOLS = 3;
     static double Plot_Buffer[][] = new double[NROWS][NCOLS];
     static int Pb_NValues;
     private String file = "OutputFile";
@@ -104,7 +107,7 @@ public class DisplayFrame
 		mainFrame.setTitle("PulseOximeter 0.0.1");
 		mainFrame.setVisible(true);
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		mainFrame.setBounds(100, 100, 930, 600);
+		mainFrame.setBounds(100, 100, 930, 650);
 		SpringLayout springLayout =  new SpringLayout();
 		mainFrame.getContentPane().setLayout(springLayout);
 		
@@ -282,23 +285,39 @@ public class DisplayFrame
 		JScrollPane scrollPane = new JScrollPane();
 		springLayout.putConstraint(SpringLayout.SOUTH, scrollPane, -10, SpringLayout.NORTH, Cmnd_panel);
 		springLayout.putConstraint(SpringLayout.EAST, scrollPane, 250, SpringLayout.WEST, mainFrame.getContentPane());
-		springLayout.putConstraint(SpringLayout.NORTH, scrollPane, 50, SpringLayout.NORTH, mainFrame.getContentPane());
+		springLayout.putConstraint(SpringLayout.NORTH, scrollPane, 55, SpringLayout.NORTH, mainFrame.getContentPane());
 		springLayout.putConstraint(SpringLayout.WEST, scrollPane, 10, SpringLayout.WEST, mainFrame.getContentPane());
 		mainFrame.getContentPane().add(scrollPane);
 		
 		//adding graph panel
 		graphPanel = new JPanel();
 		graphPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		springLayout.putConstraint(SpringLayout.NORTH, graphPanel, 50, SpringLayout.NORTH, mainFrame.getContentPane());
+		springLayout.putConstraint(SpringLayout.NORTH, graphPanel, 55, SpringLayout.NORTH, mainFrame.getContentPane());
 		springLayout.putConstraint(SpringLayout.WEST, graphPanel, 10, SpringLayout.EAST, scrollPane);
-		springLayout.putConstraint(SpringLayout.SOUTH, graphPanel, -10, SpringLayout.NORTH, Cmnd_panel);
+		springLayout.putConstraint(SpringLayout.SOUTH, graphPanel, -340, SpringLayout.NORTH, Cmnd_panel);
 		springLayout.putConstraint(SpringLayout.EAST, graphPanel, -10, SpringLayout.EAST, mainFrame.getContentPane());
+		
+		graphPanel1 = new JPanel();
+		graphPanel1.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		springLayout.putConstraint(SpringLayout.NORTH, graphPanel1, 10, SpringLayout.SOUTH, graphPanel);
+		springLayout.putConstraint(SpringLayout.WEST, graphPanel1, 10, SpringLayout.EAST, scrollPane);
+		springLayout.putConstraint(SpringLayout.SOUTH, graphPanel1, -170, SpringLayout.NORTH, Cmnd_panel);
+		springLayout.putConstraint(SpringLayout.EAST, graphPanel1, -10, SpringLayout.EAST, mainFrame.getContentPane());
+		
+		graphPanel2 = new JPanel();
+		graphPanel2.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		springLayout.putConstraint(SpringLayout.NORTH, graphPanel2, 10, SpringLayout.SOUTH, graphPanel1);
+		springLayout.putConstraint(SpringLayout.WEST, graphPanel2, 10, SpringLayout.EAST, scrollPane);
+		springLayout.putConstraint(SpringLayout.SOUTH, graphPanel2, -10, SpringLayout.NORTH, Cmnd_panel);
+		springLayout.putConstraint(SpringLayout.EAST, graphPanel2, -10, SpringLayout.EAST, mainFrame.getContentPane());
 		
 		//adding Tout text pane
 		toutTextPane = new JTextPane();
 		toutTextPane.setEditable(false);
 		scrollPane.setViewportView(toutTextPane);
 		mainFrame.getContentPane().add(graphPanel);
+		mainFrame.getContentPane().add(graphPanel1);
+		mainFrame.getContentPane().add(graphPanel2);
 		
 		// adding menu bar and items with action listener
 		JMenuBar menuBar = new JMenuBar();
@@ -366,8 +385,10 @@ public class DisplayFrame
 		ppgField.setText(Integer.toString(ppg));
 	}
 	
-	//function to create chart, adding it to graph panel and setting the required parameters
+	//function to create chart, adding it to graph panel and setting the required parameters;  creating 3 different chart to plot 3 graphs
 	private void createChart() {
+		
+		//creating first chart
 		chart = new Chart2D();
 		trace = new Trace2DLtd(numTraces);
 		trace.setColor(Color.RED);
@@ -384,20 +405,60 @@ public class DisplayFrame
 		graphPanel.setLayout(new BorderLayout(0, 0));
 		graphPanel.add(chart);
 		chart.setVisible(true);
-		chart.setSize(600, 500);
 		graphPanel.setVisible(true);
 		graphPanel.repaint();
+	
+		//creating second chart
+		chart1 = new Chart2D();
+		trace1 = new Trace2DLtd(numTraces);
+		trace1.setColor(Color.BLUE);
+		IAxis axisX1 = chart1.getAxisX();
+	    axisX1.setPaintGrid(true);
+	    axisX1.getAxisTitle().setTitle("Time (s)");
+	    IAxis axisY1 = chart1.getAxisY();
+	    axisY1.setPaintGrid(true);
+	    axisY1.getAxisTitle().setTitle("PPG (AC)");
+
+		chart1.addTrace(trace1);
+		trace1.setName("PPG AC component");
+		
+		graphPanel1.setLayout(new BorderLayout(0, 0));
+		graphPanel1.add(chart1);
+		chart1.setVisible(true);
+		graphPanel1.setVisible(true);
+		graphPanel1.repaint();
+		
+		
+		//creating third chart
+		chart2 = new Chart2D();
+		trace2 = new Trace2DLtd(numTraces);
+		trace2.setColor(Color.MAGENTA);
+		IAxis axisX2 = chart2.getAxisX();
+	    axisX2.setPaintGrid(true);
+	    axisX2.getAxisTitle().setTitle("Time (s)");
+	    IAxis axisY2 = chart2.getAxisY();
+	    axisY2.setPaintGrid(true);
+	    axisY2.getAxisTitle().setTitle("r");
+
+		chart2.addTrace(trace2);
+		trace2.setName("r component");
+		
+		graphPanel2.setLayout(new BorderLayout(0, 0));
+		graphPanel2.add(chart2);
+		chart2.setVisible(true);
+		graphPanel2.setVisible(true);
+		graphPanel2.repaint();		
 	}
 	
 	//function to plot point at x,y on the chart; we have to pass value of x & y as parameter
 	private void plotChart(int xvalue, double yvalue) {	
-		trace.addPoint(xvalue, yvalue);
+		trace.addPoint(xvalue, yvalue);		
 	}
 	
 	//function to clear Graph
 	private void clearChart() {
-		trace.removeAllPoints();
-		trace.addPoint(0,0);
+		//trace.removeAllPoints();
+		//trace.addPoint(0,0);
 		save.setEnabled(false);
 		Pb_Ready = false;
 		Start.setEnabled(true);
