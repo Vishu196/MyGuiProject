@@ -68,6 +68,7 @@ public class DisplayFrame
     static double Plot_Buffer[][] = new double[NROWS][NCOLS];
     static int Pb_NValues;
     private String file = "OutputFile";
+    public static final boolean DEBUG = true;
 	
 	public static void main(String[] args) {
 		
@@ -709,7 +710,9 @@ public class DisplayFrame
 	//function to process the data when Data packet is received; we have to pass the received data as parameter
 	private void processData(byte[] data) {
 		if(data.length <= NCOLS) {
+			if(DEBUG){
     		System.out.printf("processData: Data Insufficient");
+			}
 			return;
 		}
 		int spo2 = (int)data[1];
@@ -717,7 +720,9 @@ public class DisplayFrame
 		int ppg = (int)data[3];
 		
 		displayReading(spo2, bpm, ppg);
+		if(DEBUG){
 		System.out.printf("Values: %d %d %d\n", spo2,bpm,ppg);
+		}
 		if(!Pb_Ready) {
 			Plot_Buffer[Pb_NValues][0] = (double)spo2;
 			Plot_Buffer[Pb_NValues][1] = (double)bpm;

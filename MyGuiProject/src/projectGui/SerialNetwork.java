@@ -47,7 +47,9 @@ public class SerialNetwork {
 			mPort = SerialPort.getCommPort(portName);
 			mPort.setComPortParameters(115200, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY, false);
         	if (mPort.openPort() == false) {
+        		if(DisplayFrame.DEBUG){
         		System.out.printf("*** error open %s\n", portName);
+        		}
         		return false;
         	}
         	else {
@@ -95,7 +97,9 @@ public class SerialNetwork {
 		/*read the first byte, check if it is startByte*/
 		mPort.readBytes(temp,bytesToRead); 
 		if (temp[0] != startByte) {
+			if(DisplayFrame.DEBUG){
 			System.out.printf("ErrorByte:[0x%X] \n", temp[0]);
+			}
 			return error;						/*if first byte is not startByte, return error*/
 		}
 		
@@ -106,20 +110,26 @@ public class SerialNetwork {
 		mPort.readBytes(data, bytesToRead);
 		System.out.printf("data:");
 		for (int i = 0; i < bytesToRead; i++) {
+			if(DisplayFrame.DEBUG){
 			System.out.printf("0x%X,", data[i]);
+			}
 			crc[0] = (byte) (crc[0] ^ data[i]);
 		}
 		
 		bytesToRead = 1;
 		mPort.readBytes(temp, bytesToRead);
 		if (temp[0] != crc[0]) {
+			if(DisplayFrame.DEBUG){
 			System.out.printf("CRC check failed \n");
+			}
 			return error;						/*if first byte is not startByte, return error*/
 		}
 		
 		mPort.readBytes(temp, bytesToRead);
 		if (temp[0] != stopByte) {
+			if(DisplayFrame.DEBUG){
 			System.out.printf("Stopbyte check failed \n");
+			}
 			return error;						/*if first byte is not startByte, return error*/
 		}
 		
