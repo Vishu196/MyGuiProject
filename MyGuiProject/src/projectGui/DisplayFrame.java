@@ -64,7 +64,7 @@ public class DisplayFrame
     private SimpleAttributeSet TextSet = new SimpleAttributeSet();
     static int Downl_Cnt;
     static boolean Pb_Ready;
-    static final int NROWS = 300, NCOLS = 3;
+    static final int NROWS = 300, NCOLS = 4;
     static double Plot_Buffer[][] = new double[NROWS][NCOLS];
     static int Pb_NValues;
     private String file = "OutputFile";
@@ -368,7 +368,7 @@ public class DisplayFrame
 		displayUpdateTimer.start();
 		Downl_Cnt = 0;
         Pb_NValues = 0;
-        Pb_Ready = false;
+        Pb_Ready = true;
 	}
 
 	// function to add available ports in drop down list
@@ -418,10 +418,10 @@ public class DisplayFrame
 	    axisX1.getAxisTitle().setTitle("Time (s)");
 	    IAxis axisY1 = chart1.getAxisY();
 	    axisY1.setPaintGrid(true);
-	    axisY1.getAxisTitle().setTitle("PPG (AC)");
+	    axisY1.getAxisTitle().setTitle("PPG");
 
 		chart1.addTrace(trace1);
-		trace1.setName("PPG AC component");
+		trace1.setName("PPG");
 		
 		graphPanel1.setLayout(new BorderLayout(0, 0));
 		graphPanel1.add(chart1);
@@ -452,16 +452,23 @@ public class DisplayFrame
 	}
 	
 	//function to plot point at x,y on the chart; we have to pass value of x & y as parameter
-	private void plotChart(int xvalue, double yvalue) {	
-		trace.addPoint(xvalue, yvalue);		
+	private void plotChart(int xvalue, double yvalue, double y1value, double y2value) {	
+		trace.addPoint(xvalue, yvalue);	
+		trace1.addPoint(xvalue,y1value);
+		trace2.addPoint(xvalue,y2value);
 	}
 	
 	//function to clear Graph
 	private void clearChart() {
-		//trace.removeAllPoints();
-		//trace.addPoint(0,0);
+		trace.removeAllPoints();
+		trace.addPoint(0,0);
+		trace1.removeAllPoints();
+		trace1.addPoint(0,0);
+		trace2.removeAllPoints();
+		trace2.addPoint(0,0);
+	
 		save.setEnabled(false);
-		Pb_Ready = false;
+		Pb_Ready = true;
 		Start.setEnabled(true);
 	}
 	
@@ -472,9 +479,14 @@ public class DisplayFrame
 	                // save the chart to a file
 	                try {
 	                    BufferedImage bi = chart.snapShot();
-	                    ImageIO.write(bi, "JPEG", new File("Graph.jpg"));
-	                    JOptionPane.showMessageDialog(mainFrame, "Graph and Data Saved");
-	                    printTextWin("\n Graph and Data Saved ", 1, true);
+	                    ImageIO.write(bi, "JPEG", new File("HeartRate.jpg"));
+	                    BufferedImage bi1 = chart.snapShot();
+	                    ImageIO.write(bi1, "JPEG", new File("PPG.jpg"));
+	                    BufferedImage bi2 = chart.snapShot();
+	                    ImageIO.write(bi2, "JPEG", new File("rValue.jpg"));
+	                    
+	                    JOptionPane.showMessageDialog(mainFrame, "Graphs and Data Saved");
+	                    printTextWin("\n Graphs and Data Saved ", 1, true);
 	                    System.out.println("\n Graph Saved  \n ");
 	                    // other possible file formats are PNG and BMP
 	                } catch (Exception ex) {
@@ -493,8 +505,8 @@ public class DisplayFrame
                 try {
                    Writer out = new OutputStreamWriter(new FileOutputStream(file));
 					for (int k = 0; k < NROWS; k++) {
-	                    out.write(String.format(Locale.ENGLISH, "%f %f %f \n",
-	                    	Plot_Buffer[k][0], Plot_Buffer[k][1],Plot_Buffer[k][2]));
+	                    out.write(String.format(Locale.ENGLISH, "%f %f %f %f \n",
+	                    	Plot_Buffer[k][0], Plot_Buffer[k][1],Plot_Buffer[k][2], Plot_Buffer[k][3]));
 					}
 					out.close();
 				}
@@ -552,11 +564,11 @@ public class DisplayFrame
 	//function for action on Plot command
 	private void actionPlotGraph() {
 		for(int i=0; i<NROWS; i++) {
-			plotChart(i,Plot_Buffer[i][1]);
+			plotChart(i,Plot_Buffer[i][1], Plot_Buffer[i][2], Plot_Buffer[i][3]);
 		}
 		save.setEnabled(true);
 		clearGraph.setEnabled(true);
-		Pb_Ready = false;
+		//Pb_Ready = true;
 		plotGraph.setEnabled(false);	
 	}
 	
@@ -691,7 +703,7 @@ public class DisplayFrame
 					printTextWin("+", 1, false);
 					processData(rData);
 					Downl_Cnt++;
-					if (Downl_Cnt>25) {
+					if (Downl_Cnt>30) {
 						Downl_Cnt = 0;
 						printTextWin(" ", 1, true);
 					}
@@ -723,15 +735,16 @@ public class DisplayFrame
 		if(DEBUG){
 		System.out.printf("Values: %d %d %d\n", spo2,bpm,ppg);
 		}
-		if(!Pb_Ready) {
+		if(Pb_Ready) {
 			Plot_Buffer[Pb_NValues][0] = (double)spo2;
 			Plot_Buffer[Pb_NValues][1] = (double)bpm;
 			Plot_Buffer[Pb_NValues][2] = (double)ppg;
+			plotGraph.setEnabled(true);
 		}
 		if(Pb_NValues >= NROWS-1) {
 			printTextWin("\n Download finished.", 1, true);
-			plotGraph.setEnabled(true);
-    		Pb_Ready = true;
+    		Pb_Ready = false;
+    		plotGraph.setEnabled(false);
     		Pb_NValues = 0;	
 		}
 		else {
