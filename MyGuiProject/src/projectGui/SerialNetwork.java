@@ -28,6 +28,7 @@ public class SerialNetwork {
 	public static final byte pType_stopData = 0x30;
 	public static final byte pType_stopOk = 0x31;
 	public static final byte pType_error = 0x32;
+	//public static final byte pType_consoleText = 0x33;
 	public static final byte[] error = {(byte) 0xff};
 		
 	// function to get available serial ports and return the names
@@ -86,7 +87,7 @@ public class SerialNetwork {
 		long bytesToRead = 1;
 		byte[] temp = new byte[1];
 		byte[] crc = new byte[1];
-		crc[0] = 0x00;
+		
 		
 		/* check if min bytes are available for reading*/
 		if(mPort.bytesAvailable() < minBytes) {
@@ -105,6 +106,7 @@ public class SerialNetwork {
 		
 		mPort.readBytes(temp,bytesToRead); 
 		bytesToRead = temp[0];
+		crc[0] = temp[0];
 		byte[] data = new byte[(int) bytesToRead];
 		
 		mPort.readBytes(data, bytesToRead);

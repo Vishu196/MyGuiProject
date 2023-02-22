@@ -17,6 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import javax.swing.Timer;
 import javax.imageio.ImageIO;
@@ -711,6 +712,14 @@ public class DisplayFrame
 
 				case SerialNetwork.pType_error:
 					break;
+					
+				case SerialNetwork.pType_consoleText:
+					String s = new String(rData, StandardCharsets.UTF_8);
+				    System.out.println("Output : " + s);
+				    printTextWin(s , 2, true);
+					break;
+					
+					
 				}
 			}
 			catch  (NumberFormatException e) {
