@@ -50,7 +50,7 @@ public class DisplayFrame
 	private JFrame mainFrame;
 	private JTextField cmnd_Field, spo2Field,bpmField, ppgField;
 	private JComboBox<String> portList ;
-	private JButton Start, Connect, R, Disconnect, plotGraph, clearGraph, save, stop;
+	private JButton Start, Connect, R, Disconnect, clearGraph, save, stop;
 	private JPanel graphPanel, graphPanel1, graphPanel2;
 	private JTextPane toutTextPane;
 	private Timer displayUpdateTimer;
@@ -236,20 +236,6 @@ public class DisplayFrame
 		ppgField.setEditable(false);
 		ppgField.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		ppgField.setBackground(Color.WHITE);
-		
-		// adding Plot graph button and its action listener
-		plotGraph = new JButton();
-		plotGraph.setText("Plot Graph ");
-		plotGraph.setHorizontalAlignment(SwingConstants.RIGHT);
-		plotGraph.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				//actionPlotGraph();
-			}
-		});
-		plotGraph.setFocusable(false);
-		plotGraph.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		plotGraph.setEnabled(false);
-		Readings_panel.add(plotGraph);
 		
 		// adding Clear graph button and its action listener
 		clearGraph = new JButton();
@@ -547,7 +533,6 @@ public class DisplayFrame
 			R.setEnabled(false);
 			portList.setEnabled(false);
 			Start.setEnabled(true);
-			plotGraph.setEnabled(true);
 			
 		}
 		else {
@@ -565,7 +550,6 @@ public class DisplayFrame
 		clearChart();
 		Connect.setEnabled(true);
 		Disconnect.setEnabled(false);
-		plotGraph.setEnabled(false);
 		clearGraph.setEnabled(false);
 		Start.setEnabled(false);
 		stop.setEnabled(false);
@@ -603,8 +587,7 @@ public class DisplayFrame
 			plotChart(i,Plot_Buffer[i][0], Plot_Buffer[i][1], Plot_Buffer[i][2]);
 		}
 		save.setEnabled(true);
-		//Pb_Ready = true;
-		plotGraph.setEnabled(false);	
+		//Pb_Ready = true;	
 	}
 	
 	//function for action on clear graph command
@@ -686,12 +669,8 @@ public class DisplayFrame
 				printTextWin("\n  *** Device not connected***", 3, true);
 			}
 		}else if (command.startsWith("plot")) {
-			if(plotGraph.isEnabled()) {
 				actionPlotGraph();
-			}else {
-				printTextWin("\n  *** Values not received***", 3, true);
-			}
-		}else if (command.startsWith("saveGr")) {
+			}else if (command.startsWith("saveGr")) {
 			if(save.isEnabled()) {
 					saveChart();
 			}else {
@@ -790,9 +769,7 @@ public class DisplayFrame
 		}
 		if(Pb_NValues >= NROWS-1) {
 			printTextWin("\n Download finished.", 1, true);
-    		Pb_Ready = false;
-    		plotGraph.setEnabled(false);
-    			
+    		Pb_Ready = false;    			
 		}
 		else {
 			Pb_NValues++;
@@ -811,8 +788,8 @@ public class DisplayFrame
 		sendData[2] = pType;
 		sendData[3] = (byte) (crc^pType);
 		sendData[4] = SerialNetwork.stopByte;
-	//	sendData[5] = 0x0D;
-	//	sendData[6] = 0x0A;
+//		sendData[5] = 0x0D;
+//		sendData[6] = 0x0A;
 		
 		SerialNetwork.sendData(sendData, sendData.length);
 		}
