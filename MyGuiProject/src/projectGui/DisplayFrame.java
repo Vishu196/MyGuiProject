@@ -17,7 +17,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import javax.swing.Timer;
 import javax.imageio.ImageIO;
@@ -51,7 +50,7 @@ public class DisplayFrame
 	private JFrame mainFrame;
 	private JTextField cmnd_Field, spo2Field,bpmField, ppgField;
 	private JComboBox<String> portList ;
-	private JButton Start, Connect, R, Disconnect, plotGraph, clearGraph, save;
+	private JButton Start, Connect, R, Disconnect, plotGraph, clearGraph, save, stop;
 	private JPanel graphPanel, graphPanel1, graphPanel2;
 	private JTextPane toutTextPane;
 	private Timer displayUpdateTimer;
@@ -65,7 +64,7 @@ public class DisplayFrame
     private SimpleAttributeSet TextSet = new SimpleAttributeSet();
     static int Downl_Cnt;
     static boolean Pb_Ready;
-    static final int NROWS = 300, NCOLS = 4;
+    static final int NROWS = 300, NCOLS = 3;
     static double Plot_Buffer[][] = new double[NROWS][NCOLS];
     static int Pb_NValues;
     private String file = "OutputFile";
@@ -244,7 +243,7 @@ public class DisplayFrame
 		plotGraph.setHorizontalAlignment(SwingConstants.RIGHT);
 		plotGraph.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				actionPlotGraph();
+				//actionPlotGraph();
 			}
 		});
 		plotGraph.setFocusable(false);
@@ -281,6 +280,21 @@ public class DisplayFrame
 		save.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		Readings_panel.add(save);
 		
+		
+		// adding stop button and its action listener
+		stop = new JButton();
+		stop.setText("Stop ");
+		stop.setHorizontalAlignment(SwingConstants.RIGHT);
+		stop.setEnabled(false);
+		stop.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				actionStop();
+			}
+		});
+		stop.setFocusable(false);
+		stop.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		Readings_panel.add(stop);
+				
 		mainFrame.getContentPane().add(Readings_panel);
 		
 		//adding scroll pane
@@ -359,7 +373,7 @@ public class DisplayFrame
 		createChart();
 		
 		//Creating a timer for updating in real time
-		displayUpdateTimer =  new Timer(250, new ActionListener() {
+		displayUpdateTimer =  new Timer(10, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				updateDynamic();
@@ -400,6 +414,7 @@ public class DisplayFrame
 	    IAxis axisY = chart.getAxisY();
 	    axisY.setPaintGrid(true);
 	    axisY.getAxisTitle().setTitle("Heart Rate");
+	    
 
 		chart.addTrace(trace);
 		trace.setName("Graph for Heart Rate");
@@ -461,6 +476,7 @@ public class DisplayFrame
 	
 	//function to clear Graph
 	private void clearChart() {
+		
 		trace.removeAllPoints();
 		trace.addPoint(0,0);
 		trace1.removeAllPoints();
@@ -481,9 +497,9 @@ public class DisplayFrame
 	                try {
 	                    BufferedImage bi = chart.snapShot();
 	                    ImageIO.write(bi, "JPEG", new File("HeartRate.jpg"));
-	                    BufferedImage bi1 = chart.snapShot();
+	                    BufferedImage bi1 = chart1.snapShot();
 	                    ImageIO.write(bi1, "JPEG", new File("PPG.jpg"));
-	                    BufferedImage bi2 = chart.snapShot();
+	                    BufferedImage bi2 = chart2.snapShot();
 	                    ImageIO.write(bi2, "JPEG", new File("rValue.jpg"));
 	                    
 	                    JOptionPane.showMessageDialog(mainFrame, "Graphs and Data Saved");
@@ -506,8 +522,8 @@ public class DisplayFrame
                 try {
                    Writer out = new OutputStreamWriter(new FileOutputStream(file));
 					for (int k = 0; k < NROWS; k++) {
-	                    out.write(String.format(Locale.ENGLISH, "%f %f %f %f \n",
-	                    	Plot_Buffer[k][0], Plot_Buffer[k][1],Plot_Buffer[k][2], Plot_Buffer[k][3]));
+	                    out.write(String.format(Locale.ENGLISH, "%f %f %f \n",
+	                    	Plot_Buffer[k][0], Plot_Buffer[k][1],Plot_Buffer[k][2]));
 					}
 					out.close();
 				}
@@ -524,12 +540,15 @@ public class DisplayFrame
 		boolean checkConnect = SerialNetwork.connectPort(portList.getSelectedItem().toString());
 		if (checkConnect) {
 			String c = "Connected to " + SerialNetwork.getConnectionName();
+			clearChart();
 			printTextWin(c,1,true);
 			Disconnect.setEnabled(true);
 			Connect.setEnabled(false);
 			R.setEnabled(false);
 			portList.setEnabled(false);
 			Start.setEnabled(true);
+			plotGraph.setEnabled(true);
+			
 		}
 		else {
 			String f = "Connection failed" ;
@@ -543,32 +562,47 @@ public class DisplayFrame
 		SerialNetwork.disconnectPort();
 		String d = "\n" + name + " Disconnected";
 		printTextWin(d,1,true);
+		clearChart();
 		Connect.setEnabled(true);
 		Disconnect.setEnabled(false);
 		plotGraph.setEnabled(false);
 		clearGraph.setEnabled(false);
 		Start.setEnabled(false);
+		stop.setEnabled(false);
 		R.setEnabled(true);
 		portList.setEnabled(true);
 		spo2Field.setText("");
 		bpmField.setText("");
 		ppgField.setText("");
-		clearChart();
+		
+	
+             
 	}
 	
 	//function for action on start command
 	private void actionStart() {
 		Start.setEnabled(false);
 		sendPacket(SerialNetwork.pType_start);
+		stop.setEnabled(true);
 	}
 	
+	//function for action on start command
+		private void actionStop() {
+			sendPacket(SerialNetwork.pType_stopData);
+			printTextWin("\n Data Stopped", 3, true);
+			clearGraph.setEnabled(true);
+			stop.setEnabled(false);
+			Start.setEnabled(true);  
+			Pb_NValues = 0;			
+		}
+		
+		
 	//function for action on Plot command
 	private void actionPlotGraph() {
 		for(int i=0; i<NROWS; i++) {
-			plotChart(i,Plot_Buffer[i][1], Plot_Buffer[i][2], Plot_Buffer[i][3]);
+			plotChart(i,Plot_Buffer[i][0], Plot_Buffer[i][1], Plot_Buffer[i][2]);
 		}
 		save.setEnabled(true);
-		clearGraph.setEnabled(true);
 		//Pb_Ready = true;
 		plotGraph.setEnabled(false);	
 	}
@@ -713,12 +747,16 @@ public class DisplayFrame
 				case SerialNetwork.pType_error:
 					break;
 					
-				case SerialNetwork.pType_consoleText:
+				case SerialNetwork.pType_stopOk:
+					Pb_Ready = false;
+					break;
+					
+				/*case SerialNetwork.pType_consoleText:
 					String s = new String(rData, StandardCharsets.UTF_8);
 				    System.out.println("Output : " + s);
 				    printTextWin(s , 2, true);
 					break;
-					
+					*/
 					
 				}
 			}
@@ -748,13 +786,13 @@ public class DisplayFrame
 			Plot_Buffer[Pb_NValues][0] = (double)spo2;
 			Plot_Buffer[Pb_NValues][1] = (double)bpm;
 			Plot_Buffer[Pb_NValues][2] = (double)ppg;
-			plotGraph.setEnabled(true);
+			actionPlotGraph();
 		}
 		if(Pb_NValues >= NROWS-1) {
 			printTextWin("\n Download finished.", 1, true);
     		Pb_Ready = false;
     		plotGraph.setEnabled(false);
-    		Pb_NValues = 0;	
+    			
 		}
 		else {
 			Pb_NValues++;
@@ -773,6 +811,9 @@ public class DisplayFrame
 		sendData[2] = pType;
 		sendData[3] = (byte) (crc^pType);
 		sendData[4] = SerialNetwork.stopByte;
+	//	sendData[5] = 0x0D;
+	//	sendData[6] = 0x0A;
+		
 		SerialNetwork.sendData(sendData, sendData.length);
 		}
 

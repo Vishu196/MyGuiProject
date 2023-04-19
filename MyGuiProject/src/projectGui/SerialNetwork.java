@@ -87,6 +87,7 @@ public class SerialNetwork {
 		long bytesToRead = 1;
 		byte[] temp = new byte[1];
 		byte[] crc = new byte[1];
+		crc[0] = 0x00;
 		
 		
 		/* check if min bytes are available for reading*/
@@ -106,7 +107,7 @@ public class SerialNetwork {
 		
 		mPort.readBytes(temp,bytesToRead); 
 		bytesToRead = temp[0];
-		crc[0] = temp[0];
+		//crc[0] = temp[0];
 		byte[] data = new byte[(int) bytesToRead];
 		
 		mPort.readBytes(data, bytesToRead);
