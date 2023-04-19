@@ -25,10 +25,10 @@ public class SerialNetwork {
 	public static final byte pType_startFail = 0x27;
 	public static final byte pType_sendData = 0x28;
 	public static final byte pType_data = 0x29;
-	public static final byte pType_stopData = 0x30;
-	public static final byte pType_stopOk = 0x31;
+//	public static final byte pType_stopData = 0x30;
+//	public static final byte pType_stopOk = 0x31;
 	public static final byte pType_error = 0x32;
-	//public static final byte pType_consoleText = 0x33;
+	public static final byte pType_consoleText = 0x33;
 	public static final byte[] error = {(byte) 0xff};
 		
 	// function to get available serial ports and return the names
@@ -85,6 +85,7 @@ public class SerialNetwork {
 		}
 		int minBytes = 5;
 		long bytesToRead = 1;
+		byte[] start = new byte[1];
 		byte[] temp = new byte[1];
 		byte[] crc = new byte[1];
 		crc[0] = 0x00;
@@ -96,8 +97,9 @@ public class SerialNetwork {
 			return error; 		
 		}
 		
-		/*read the first byte, check if it is startByte*/
+		/*read the first byte, check if it is startByte or consoleText Byte*/
 		mPort.readBytes(temp,bytesToRead); 
+		start[0] = temp[0];
 		if (temp[0] != startByte) {
 			if(DisplayFrame.DEBUG){
 			System.out.printf("ErrorByte:[0x%X] \n", temp[0]);
@@ -107,7 +109,7 @@ public class SerialNetwork {
 		
 		mPort.readBytes(temp,bytesToRead); 
 		bytesToRead = temp[0];
-		//crc[0] = temp[0];
+		crc[0] = (byte) (start[0] ^ temp[0]);
 		byte[] data = new byte[(int) bytesToRead];
 		
 		mPort.readBytes(data, bytesToRead);
@@ -123,6 +125,7 @@ public class SerialNetwork {
 		mPort.readBytes(temp, bytesToRead);
 		if (temp[0] != crc[0]) {
 			if(DisplayFrame.DEBUG){
+				System.out.printf("CRC value", crc)	;
 			System.out.printf("CRC check failed \n");
 			}
 			return error;						/*if first byte is not startByte, return error*/

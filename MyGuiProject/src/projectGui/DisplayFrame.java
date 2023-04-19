@@ -17,6 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import javax.swing.Timer;
 import javax.imageio.ImageIO;
@@ -60,11 +61,11 @@ public class DisplayFrame
 	static final int NTRACES = 3;
     static ITrace2D mtraces[] = new ITrace2D[3];
 	private ITrace2D trace, trace1, trace2;
-    private int numTraces = 300;
+    private int numTraces = 1000;
     private SimpleAttributeSet TextSet = new SimpleAttributeSet();
     static int Downl_Cnt;
     static boolean Pb_Ready;
-    static final int NROWS = 300, NCOLS = 3;
+    static final int NROWS = 1000, NCOLS = 3;
     static double Plot_Buffer[][] = new double[NROWS][NCOLS];
     static int Pb_NValues;
     private String file = "OutputFile";
@@ -267,19 +268,19 @@ public class DisplayFrame
 		Readings_panel.add(save);
 		
 		
-		// adding stop button and its action listener
-		stop = new JButton();
-		stop.setText("Stop ");
-		stop.setHorizontalAlignment(SwingConstants.RIGHT);
-		stop.setEnabled(false);
-		stop.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				actionStop();
-			}
-		});
-		stop.setFocusable(false);
-		stop.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		Readings_panel.add(stop);
+//		// adding stop button and its action listener
+//		stop = new JButton();
+//		stop.setText("Stop ");
+//		stop.setHorizontalAlignment(SwingConstants.RIGHT);
+//		stop.setEnabled(false);
+//		stop.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent arg0) {
+//				actionStop();
+//			}
+//		});
+//		stop.setFocusable(false);
+//		stop.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+//		Readings_panel.add(stop);
 				
 		mainFrame.getContentPane().add(Readings_panel);
 		
@@ -359,7 +360,7 @@ public class DisplayFrame
 		createChart();
 		
 		//Creating a timer for updating in real time
-		displayUpdateTimer =  new Timer(10, new ActionListener() {
+		displayUpdateTimer =  new Timer(1, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				updateDynamic();
@@ -471,7 +472,7 @@ public class DisplayFrame
 		trace2.addPoint(0,0);
 	
 		save.setEnabled(false);
-		Pb_Ready = true;
+		//Pb_Ready = true;
 		Start.setEnabled(true);
 	}
 	
@@ -545,40 +546,34 @@ public class DisplayFrame
 	private void actionDisconnect() {
 		String name = SerialNetwork.getConnectionName();
 		SerialNetwork.disconnectPort();
+		Pb_Ready = false;
 		String d = "\n" + name + " Disconnected";
 		printTextWin(d,1,true);
-		clearChart();
 		Connect.setEnabled(true);
 		Disconnect.setEnabled(false);
-		clearGraph.setEnabled(false);
+		clearGraph.setEnabled(true);
 		Start.setEnabled(false);
-		stop.setEnabled(false);
+		//stop.setEnabled(false);
 		R.setEnabled(true);
-		portList.setEnabled(true);
-		spo2Field.setText("");
-		bpmField.setText("");
-		ppgField.setText("");
-		
-	
-             
+		portList.setEnabled(true);             
 	}
 	
 	//function for action on start command
 	private void actionStart() {
 		Start.setEnabled(false);
 		sendPacket(SerialNetwork.pType_start);
-		stop.setEnabled(true);
+		//stop.setEnabled(true);
+
 	}
 	
 	//function for action on start command
-		private void actionStop() {
-			sendPacket(SerialNetwork.pType_stopData);
-			printTextWin("\n Data Stopped", 3, true);
-			clearGraph.setEnabled(true);
-			stop.setEnabled(false);
-			Start.setEnabled(true);  
-			Pb_NValues = 0;			
-		}
+//		private void actionStop() {
+//			sendPacket(SerialNetwork.pType_stopData);
+//			clearGraph.setEnabled(true);
+//			printTextWin("\n Data Stopped", 3, true);
+//			stop.setEnabled(false);
+//			Start.setEnabled(true);  
+//		}
 		
 		
 	//function for action on Plot command
@@ -721,21 +716,22 @@ public class DisplayFrame
 						Downl_Cnt = 0;
 						printTextWin(" ", 1, true);
 					}
+					sendPacket(SerialNetwork.pType_sendData);
 					break;
 
 				case SerialNetwork.pType_error:
 					break;
 					
-				case SerialNetwork.pType_stopOk:
-					Pb_Ready = false;
-					break;
+//				case SerialNetwork.pType_stopOk:
+//					Pb_Ready = false;
+//					break;
 					
-				/*case SerialNetwork.pType_consoleText:
+				case SerialNetwork.pType_consoleText:
 					String s = new String(rData, StandardCharsets.UTF_8);
 				    System.out.println("Output : " + s);
 				    printTextWin(s , 2, true);
 					break;
-					*/
+					
 					
 				}
 			}
@@ -761,7 +757,7 @@ public class DisplayFrame
 		if(DEBUG){
 		System.out.printf("Values: %d %d %d\n", spo2,bpm,ppg);
 		}
-		if(Pb_Ready) {
+		if(Pb_Ready = true) {
 			Plot_Buffer[Pb_NValues][0] = (double)spo2;
 			Plot_Buffer[Pb_NValues][1] = (double)bpm;
 			Plot_Buffer[Pb_NValues][2] = (double)ppg;
@@ -779,7 +775,7 @@ public class DisplayFrame
 	// function to send data to serial port; defined by communication protocol
 	// we have to pass packet type as parameter
 	static void sendPacket(byte pType) {
-		byte[] sendData = new byte[5];
+		byte[] sendData = new byte[7];
 		int sendDatalength = 1;
 		byte crc = 0x00;
 		
@@ -788,8 +784,8 @@ public class DisplayFrame
 		sendData[2] = pType;
 		sendData[3] = (byte) (crc^pType);
 		sendData[4] = SerialNetwork.stopByte;
-//		sendData[5] = 0x0D;
-//		sendData[6] = 0x0A;
+		sendData[5] = 0x0D;
+		sendData[6] = 0x0A;
 		
 		SerialNetwork.sendData(sendData, sendData.length);
 		}
