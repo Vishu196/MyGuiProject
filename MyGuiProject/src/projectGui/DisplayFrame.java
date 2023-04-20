@@ -230,7 +230,7 @@ public class DisplayFrame
 		bpmField.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		bpmField.setBackground(Color.WHITE);
 
-		JLabel readingLbl3 = new JLabel("PPG:");
+		JLabel readingLbl3 = new JLabel("IR:");
 		Readings_panel.add(readingLbl3);
 		ppgField = new JTextField();
 		Readings_panel.add(ppgField);
@@ -659,7 +659,7 @@ public class DisplayFrame
 						Downl_Cnt = 0;
 						printTextWin(" ", 1, true);
 					}
-					//sendPacket(SerialNetwork.pType_sendData);
+					sendPacket(SerialNetwork.pType_sendData);
 					break;
 
 				case SerialNetwork.pType_error:
@@ -700,6 +700,9 @@ public class DisplayFrame
 		int b = 0x00FF & ((int)data[4]);
 		int ppg1 = ((a<<8) | b);
 		//int ppg1 = -1356;
+		if(ppg1>32767) {
+		 ppg1 = ppg1 - 65536;
+		}
 		double ppg = (ppg1*1.0)/100;
 		
 		
