@@ -1,0 +1,33 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: UML for Metamodels
+Bundle-SymbolicName: org.eclipse.papyrus.toolsmiths.example.umlformetamodels;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Eclipse Modeling Project
+Automatic-Module-Name: org.eclipse.papyrus.toolsmiths.example.umlformetamodels
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Require-Bundle: org.eclipse.papyrus.infra.core;bundle-version="[4.0.0,5.0.0)",
+ org.eclipse.papyrus.infra.architecture;bundle-version="[3.0.0,4.0.0)",
+ org.eclipse.papyrus.infra.emf.types;bundle-version="[5.0.0,6.0.0)",
+ org.eclipse.papyrus.infra.types.core;bundle-version="[5.0.0,6.0.0)",
+ org.eclipse.papyrus.infra.types;bundle-version="[5.0.0,6.0.0)",
+ org.eclipse.uml2.uml;bundle-version="[5.5.0,6.0.0)",
+ org.eclipse.uml2.uml.profile.standard;bundle-version="[1.5.0,2.0.0)",
+ org.eclipse.uml2.uml.resources;bundle-version="[5.5.0,6.0.0)",
+ org.eclipse.papyrus.uml.architecture;bundle-version="[2.0.0,3.0.0)",
+ org.eclipse.papyrus.uml.diagram.common;bundle-version="[5.0.0,6.0.0)",
+ org.eclipse.papyrus.uml.diagram.clazz;bundle-version="[5.0.0,6.0.0)",
+ org.eclipse.gmf.runtime.emf.type.core;bundle-version="[1.9.0,2.0.0)",
+ org.eclipse.papyrus.infra.services.edit;bundle-version="[4.0.0,5.0.0)",
+ org.eclipse.papyrus.infra.core.log;bundle-version="[2.0.0,3.0.0)",
+ org.eclipse.papyrus.infra.newchild;bundle-version="[5.0.0,6.0.0)",
+ org.eclipse.papyrus.infra.emf;bundle-version="[4.0.0,5.0.0)",
+ org.eclipse.papyrus.uml.service.types;bundle-version="[5.0.0,6.0.0)",
+ org.eclipse.ui;bundle-version="[3.100.0,4.0.0)"
+Bundle-ActivationPolicy: lazy
+Bundle-Activator: org.eclipse.papyrus.toolsmiths.example.umlformetamodels.internal.Activator
+Export-Package: org.eclipse.papyrus.toolsmiths.example.umlformetamodels.internal;x-internal:=true,
+ org.eclipse.papyrus.toolsmiths.example.umlformetamodels.internal.advice;x-internal:=true,
+ org.eclipse.papyrus.toolsmiths.example.umlformetamodels.internal.commands;x-internal:=true,
+ org.eclipse.papyrus.toolsmiths.example.umlformetamodels.internal.matchers;x-internal:=true,
+ org.eclipse.papyrus.toolsmiths.example.umlformetamodels.internal.types;x-internal:=true

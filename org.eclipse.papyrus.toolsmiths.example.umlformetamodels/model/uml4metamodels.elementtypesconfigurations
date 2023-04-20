@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<elementtypesconfigurations:ElementTypeSetConfiguration xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:constraints="http://www.eclipse.org/Papyrus/2021/types/constraints" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:elementtypesconfigurations="http://www.eclipse.org/papyrus/infra/elementtypesconfigurations/1.2" xmlns:filters="http://www.eclipse.org/Papyrus/2014/common/filters" xmlns:setvaluesadvice="http://www.eclipse.org/papyrus/emf/types/setvaluesadvice/1.1" xmlns:stereotypematcher="http://www.eclipse.org/papyrus/uml/types/stereotypematcher/1.1" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xmi:id="_jQGNoHbLEeuDcqwoKFAHeg" description="Element types for the UML for Metamodels language customization." identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels" name="UML for Metamodels" metamodelNsURI="http://www.eclipse.org/uml2/5.0.0/UML">
+  <adviceBindingsConfigurations xmi:type="constraints:ConstraintAdviceConfiguration" xmi:id="_fcf3YIEXEeu-otVmyAgEnA" description="Advice constraining the permitted ends of generalizations in metamodels (for reorientation scenario)." identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.generalizationAdvice" inheritance="all">
+    <target xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Generalization"/>
+    <constraint xmi:type="constraints:RelationshipConstraint" xmi:id="_fcf3YYEXEeu-otVmyAgEnA">
+      <permission xmi:type="constraints:EndPermission" xmi:id="_fcf3YoEXEeu-otVmyAgEnA" permitted="true">
+        <endFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_fcf3Y4EXEeu-otVmyAgEnA" elementType="_WtT9UHbdEeuKjtUyU4RltQ" relationship="subtype"/>
+      </permission>
+      <permission xmi:type="constraints:EndPermission" xmi:id="_fcf3ZIEXEeu-otVmyAgEnA" permitted="false"/>
+    </constraint>
+  </adviceBindingsConfigurations>
+  <adviceBindingsConfigurations xmi:type="constraints:ConstraintAdviceConfiguration" xmi:id="_LGTWMH3pEeukW81Gg1z4fw" description="Advice constraining the permitted ends of associations in metamodels (for reorientation scenario)." identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.associationAdvice" inheritance="all">
+    <target xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.AssociationBase"/>
+    <constraint xmi:type="constraints:RelationshipConstraint" xmi:id="_XKPCIH3pEeukW81Gg1z4fw">
+      <permission xmi:type="constraints:EndPermission" xmi:id="_Zg-3EH3pEeukW81Gg1z4fw" permitted="true">
+        <endFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_5tN7wH3uEeuy-K5tzYZpCQ" elementType="_WtT9UHbdEeuKjtUyU4RltQ" relationship="subtype"/>
+      </permission>
+      <permission xmi:type="constraints:EndPermission" xmi:id="_fNAlwH3pEeukW81Gg1z4fw" permitted="false"/>
+    </constraint>
+  </adviceBindingsConfigurations>
+  <adviceBindingsConfigurations xmi:type="constraints:ConstraintAdviceConfiguration" xmi:id="_0jyEIH3rEeuRorRMZgx_8A" description="Advice constraining the permitted contents and relationships of data types in metamodels." identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.dataTypeAdvice" inheritance="all">
+    <target xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.DataType"/>
+    <constraint xmi:type="constraints:ReferenceConstraint" xmi:id="_txCvoH0oEeuouMZX9TzSzA">
+      <permission xmi:type="constraints:AnyReference" xmi:id="_txCvoX0oEeuouMZX9TzSzA" permitted="true">
+        <filter xmi:type="filters:CompoundFilter" xmi:id="_txCvon0oEeuouMZX9TzSzA" filter="_nHVWgIGjEeu5MZi-HRHmIw _kmMPcIGjEeu5MZi-HRHmIw">
+          <ownedFilter xmi:type="filters:FilterReference" xmi:id="_nHVWgIGjEeu5MZi-HRHmIw" filter="_Kr3bcoGjEeu5MZi-HRHmIw"/>
+          <ownedFilter xmi:type="filters:CompoundFilter" xmi:id="_kmMPcIGjEeu5MZi-HRHmIw" filter="_txCvpn0oEeuouMZX9TzSzA" operator="not">
+            <ownedFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_txCvpn0oEeuouMZX9TzSzA" relationship="subtype">
+              <elementType xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Property"/>
+            </ownedFilter>
+          </ownedFilter>
+        </filter>
+      </permission>
+      <permission xmi:type="constraints:AnyReference" xmi:id="_txCvqX0oEeuouMZX9TzSzA" permitted="false" referenceKind="containment"/>
+    </constraint>
+    <constraint xmi:type="constraints:RelationshipConstraint" xmi:id="_0jyEIX3rEeuRorRMZgx_8A">
+      <permission xmi:type="constraints:EndPermission" xmi:id="_0jyEJH3rEeuRorRMZgx_8A" permitted="false"/>
+    </constraint>
+  </adviceBindingsConfigurations>
+  <adviceBindingsConfigurations xmi:type="constraints:ConstraintAdviceConfiguration" xmi:id="_0r0wMIA4EeuAj6L57_kZcw" description="Advice constraining the permitted contents and relationships of attributes and operations in metamodels." identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.featureAdvice" inheritance="all">
+    <target xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Feature"/>
+    <constraint xmi:type="constraints:ReferenceConstraint" xmi:id="_ufqeAIA6EeuAj6L57_kZcw">
+      <permission xmi:type="constraints:AnyReference" xmi:id="_ufqeAYA6EeuAj6L57_kZcw" permitted="true" referenceKind="containment">
+        <filter xmi:type="filters:CompoundFilter" xmi:id="_ufqeAoA6EeuAj6L57_kZcw" name="Contents of Feature" filter="_ufqeA4A6EeuAj6L57_kZcw _ufqeBYA6EeuAj6L57_kZcw _ufqeBoA6EeuAj6L57_kZcw _om10AIA7EeuAj6L57_kZcw _tPYscIA7EeuAj6L57_kZcw" operator="or">
+          <ownedFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_ufqeA4A6EeuAj6L57_kZcw" relationship="specializationType">
+            <elementType xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Parameter"/>
+          </ownedFilter>
+          <ownedFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_ufqeBYA6EeuAj6L57_kZcw" relationship="specializationType">
+            <elementType xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Comment"/>
+          </ownedFilter>
+          <ownedFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_ufqeBoA6EeuAj6L57_kZcw" relationship="specializationType">
+            <elementType xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Constraint"/>
+          </ownedFilter>
+          <ownedFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_om10AIA7EeuAj6L57_kZcw" relationship="subtype">
+            <elementType xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.LiteralSpecification"/>
+          </ownedFilter>
+          <ownedFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_tPYscIA7EeuAj6L57_kZcw" relationship="subtype">
+            <elementType xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.InstanceValue"/>
+          </ownedFilter>
+        </filter>
+      </permission>
+      <permission xmi:type="constraints:Reference" xmi:id="_HcgWEIA7EeuAj6L57_kZcw" permitted="true">
+        <filter xmi:type="filters:CompoundFilter" xmi:id="_U7qp4IA7EeuAj6L57_kZcw" name="Allowed Types" filter="_WRemQIA7EeuAj6L57_kZcw _W9HkQIA7EeuAj6L57_kZcw _abWlsIA7EeuAj6L57_kZcw" operator="or">
+          <ownedFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_WRemQIA7EeuAj6L57_kZcw" elementType="_WtT9UHbdEeuKjtUyU4RltQ" relationship="subtype"/>
+          <ownedFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_W9HkQIA7EeuAj6L57_kZcw" relationship="specializationType">
+            <elementType xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.PrimitiveType"/>
+          </ownedFilter>
+          <ownedFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_abWlsIA7EeuAj6L57_kZcw" relationship="specializationType">
+            <elementType xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Enumeration"/>
+          </ownedFilter>
+        </filter>
+        <reference xmi:type="ecore:EReference" href="http://www.eclipse.org/uml2/5.0.0/UML#//TypedElement/type"/>
+      </permission>
+      <permission xmi:type="constraints:Reference" xmi:id="_1Z754IEpEeuKTaw-vhP0IA" permitted="true">
+        <filter xmi:type="constraints:ElementTypeFilter" xmi:id="_1Z754YEpEeuKTaw-vhP0IA" relationship="specializationType">
+          <elementType xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Property"/>
+        </filter>
+        <reference xmi:type="ecore:EReference" href="http://www.eclipse.org/uml2/5.0.0/UML#//Operation/redefinedOperation"/>
+      </permission>
+      <permission xmi:type="constraints:Reference" xmi:id="_VQk08IEiEeu-otVmyAgEnA" permitted="true">
+        <filter xmi:type="constraints:ElementTypeFilter" xmi:id="_WCPic4EiEeu-otVmyAgEnA" relationship="specializationType">
+          <elementType xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Property"/>
+        </filter>
+        <reference xmi:type="ecore:EReference" href="http://www.eclipse.org/uml2/5.0.0/UML#//Property/redefinedProperty"/>
+      </permission>
+      <permission xmi:type="constraints:Reference" xmi:id="_WCPicIEiEeu-otVmyAgEnA" permitted="true">
+        <filter xmi:type="constraints:ElementTypeFilter" xmi:id="_e5xj0IEiEeu-otVmyAgEnA" relationship="specializationType">
+          <elementType xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Property"/>
+        </filter>
+        <reference xmi:type="ecore:EReference" href="http://www.eclipse.org/uml2/5.0.0/UML#//Property/subsettedProperty"/>
+      </permission>
+      <permission xmi:type="constraints:AnyReference" xmi:id="_ufqeCIA6EeuAj6L57_kZcw" permitted="false"/>
+    </constraint>
+    <constraint xmi:type="constraints:RelationshipConstraint" xmi:id="_ujkw0IA-EeuVqrD2irClKw">
+      <permission xmi:type="constraints:EndPermission" xmi:id="_vGOK4IA-EeuVqrD2irClKw" permitted="false"/>
+    </constraint>
+  </adviceBindingsConfigurations>
+  <adviceBindingsConfigurations xmi:type="constraints:ConstraintAdviceConfiguration" xmi:id="_5lD2YIBAEeuAGPWdVz0arw" description="Advice constraining the permitted contents and relationships of operation parameters in metamodels." identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.parameterAdvice" inheritance="all">
+    <target xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Parameter"/>
+    <constraint xmi:type="constraints:ReferenceConstraint" xmi:id="_5lD2YYBAEeuAGPWdVz0arw">
+      <permission xmi:type="constraints:AnyReference" xmi:id="_5lD2YoBAEeuAGPWdVz0arw" permitted="true" referenceKind="containment">
+        <filter xmi:type="filters:FilterReference" xmi:id="_H_B94IBHEeukyY8ez9SrJQ" filter="_ufqeAoA6EeuAj6L57_kZcw"/>
+      </permission>
+      <permission xmi:type="constraints:Reference" xmi:id="_5lD2aYBAEeuAGPWdVz0arw" permitted="true">
+        <filter xmi:type="filters:FilterReference" xmi:id="_QwJOMIBHEeukyY8ez9SrJQ" filter="_U7qp4IA7EeuAj6L57_kZcw"/>
+        <reference xmi:type="ecore:EReference" href="http://www.eclipse.org/uml2/5.0.0/UML#//TypedElement/type"/>
+      </permission>
+      <permission xmi:type="constraints:AnyReference" xmi:id="_5lD2boBAEeuAGPWdVz0arw" permitted="false"/>
+    </constraint>
+    <constraint xmi:type="constraints:RelationshipConstraint" xmi:id="_5lD2b4BAEeuAGPWdVz0arw">
+      <permission xmi:type="constraints:EndPermission" xmi:id="_5lD2cIBAEeuAGPWdVz0arw" permitted="false"/>
+    </constraint>
+  </adviceBindingsConfigurations>
+  <adviceBindingsConfigurations xmi:type="constraints:ConstraintAdviceConfiguration" xmi:id="_UtrpgIBBEeuAGPWdVz0arw" description="Advice constraining the permitted contents and relationships of enumeration literals in metamodels." identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.enumerationLiteralAdvice" inheritance="all">
+    <target xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.EnumerationLiteral"/>
+    <constraint xmi:type="constraints:ReferenceConstraint" xmi:id="_UtrpgYBBEeuAGPWdVz0arw">
+      <permission xmi:type="constraints:AnyReference" xmi:id="_UtrpgoBBEeuAGPWdVz0arw" permitted="true" referenceKind="containment">
+        <filter xmi:type="filters:CompoundFilter" xmi:id="_lQsI0IBBEeuAGPWdVz0arw" filter="_lQsI0oBBEeuAGPWdVz0arw _lQsI04BBEeuAGPWdVz0arw" operator="or">
+          <ownedFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_lQsI0oBBEeuAGPWdVz0arw" relationship="specializationType">
+            <elementType xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Comment"/>
+          </ownedFilter>
+          <ownedFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_lQsI04BBEeuAGPWdVz0arw" relationship="specializationType">
+            <elementType xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Constraint"/>
+          </ownedFilter>
+        </filter>
+      </permission>
+      <permission xmi:type="constraints:AnyReference" xmi:id="_UtrphIBBEeuAGPWdVz0arw" permitted="false"/>
+    </constraint>
+    <constraint xmi:type="constraints:RelationshipConstraint" xmi:id="_UtrphYBBEeuAGPWdVz0arw">
+      <permission xmi:type="constraints:EndPermission" xmi:id="_UtrphoBBEeuAGPWdVz0arw" permitted="false"/>
+    </constraint>
+  </adviceBindingsConfigurations>
+  <adviceBindingsConfigurations xmi:type="constraints:ConstraintAdviceConfiguration" xmi:id="_oG0WMIGmEeuubbHwoiG7aw" description="Advice constraining the permitted contents and relationships of associations in metamodels." identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.associationContentsAdvice" inheritance="all">
+    <target xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.AssociationBase"/>
+    <constraint xmi:type="constraints:ReferenceConstraint" xmi:id="_oG0WMYGmEeuubbHwoiG7aw">
+      <permission xmi:type="constraints:AnyReference" xmi:id="_oG0WN4GmEeuubbHwoiG7aw" permitted="false" referenceKind="containment"/>
+    </constraint>
+    <constraint xmi:type="constraints:RelationshipConstraint" xmi:id="_oG0WOIGmEeuubbHwoiG7aw">
+      <permission xmi:type="constraints:EndPermission" xmi:id="_oG0WOYGmEeuubbHwoiG7aw" permitted="false"/>
+    </constraint>
+  </adviceBindingsConfigurations>
+  <adviceBindingsConfigurations xmi:type="setvaluesadvice:SetValuesAdviceConfiguration" xmi:id="_UYg6oIEZEeu-otVmyAgEnA" identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.setPublicVisibilityAdvice" inheritance="all">
+    <target xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.NamedElement"/>
+    <matcherConfiguration xmi:type="elementtypesconfigurations:MatcherConfiguration" xmi:id="_ViWbEIEaEeu-otVmyAgEnA" description="Matches elements that must have public visibility." matcherClassName="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.internal.matchers.MustBePublicMatcher"/>
+    <featuresToSet xmi:type="setvaluesadvice:FeatureToSet" xmi:id="_vgbjIIEZEeu-otVmyAgEnA" featureName="visibility">
+      <value xmi:type="setvaluesadvice:ConstantValue" xmi:id="_xqx60IEZEeu-otVmyAgEnA">
+        <valueInstance xmi:type="uml:InstanceValue" xmi:id="_zaZeUIEZEeu-otVmyAgEnA">
+          <instance xmi:type="uml:EnumerationLiteral" href="pathmap://UML_METAMODELS/UML.metamodel.uml#VisibilityKind-public"/>
+        </valueInstance>
+      </value>
+    </featuresToSet>
+  </adviceBindingsConfigurations>
+  <adviceBindingsConfigurations xmi:type="setvaluesadvice:SetValuesAdviceConfiguration" xmi:id="_qC3RwIEaEeu-otVmyAgEnA" identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.setPrivateVisibilityAdvice" inheritance="all">
+    <target xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.NamedElement"/>
+    <matcherConfiguration xmi:type="elementtypesconfigurations:MatcherConfiguration" xmi:id="_qC3RwYEaEeu-otVmyAgEnA" description="Matches elements that must have private visibility." matcherClassName="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.internal.matchers.MustBePrivateMatcher"/>
+    <featuresToSet xmi:type="setvaluesadvice:FeatureToSet" xmi:id="_qC3RwoEaEeu-otVmyAgEnA" featureName="visibility">
+      <value xmi:type="setvaluesadvice:ConstantValue" xmi:id="_qC3Rw4EaEeu-otVmyAgEnA">
+        <valueInstance xmi:type="uml:InstanceValue" xmi:id="_qC3RxIEaEeu-otVmyAgEnA">
+          <instance xmi:type="uml:EnumerationLiteral" href="pathmap://UML_METAMODELS/UML.metamodel.uml#VisibilityKind-private"/>
+        </valueInstance>
+      </value>
+    </featuresToSet>
+  </adviceBindingsConfigurations>
+  <adviceBindingsConfigurations xmi:type="elementtypesconfigurations:AdviceBindingConfiguration" xmi:id="_gCRH0IEgEeu-otVmyAgEnA" description="Advice that maintains the required visibility of elements that have a required visibility." identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.advice.requiredVisibilityAdvice" inheritance="all" editHelperAdviceClassName="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.internal.advice.RequiredVisibilityAdvice">
+    <target xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.NamedElement"/>
+  </adviceBindingsConfigurations>
+  <adviceBindingsConfigurations xmi:type="elementtypesconfigurations:AdviceBindingConfiguration" xmi:id="__ruo4IEgEeu-otVmyAgEnA" description="Advice for restricting the editing of association-end properties." identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.advice.associationEndAdvice" inheritance="all" editHelperAdviceClassName="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.internal.advice.AssociationEndAdvice">
+    <target xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Property"/>
+  </adviceBindingsConfigurations>
+  <adviceBindingsConfigurations xmi:type="elementtypesconfigurations:AdviceBindingConfiguration" xmi:id="_XzzKMIEjEeuR6NtV_hQ3dg" description="Advice for the editing of associations." identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.advice.associationEditAdvice" inheritance="all" editHelperAdviceClassName="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.internal.advice.AssociationEditAdvice">
+    <before xmi:type="elementtypesconfigurations:AdviceBindingConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#_SJGO0DWbEeWdwYNHBiYLiA"/>
+    <before xmi:type="elementtypesconfigurations:EditHelperAdviceConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#_Q_1wonhMEee4-vqumSjwzg"/>
+    <before xmi:type="elementtypesconfigurations:EditHelperAdviceConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#_2Jg4EXV3EeScr8rbRObDkA"/>
+    <target xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.AssociationBase"/>
+  </adviceBindingsConfigurations>
+  <adviceBindingsConfigurations xmi:type="elementtypesconfigurations:AdviceBindingConfiguration" xmi:id="_SGeVkIHUEeu4APS_uoP1tg" description="Advice on the deletion of a data type to delete attributes of that type." identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.dataTypeDeletionAdvice" inheritance="all" editHelperAdviceClassName="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.internal.advice.DataTypeDeletionAdvice">
+    <target xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.DataType"/>
+  </adviceBindingsConfigurations>
+  <elementTypeConfigurations xmi:type="elementtypesconfigurations:SpecializationTypeConfiguration" xmi:id="_Zp0SEHbaEeuKjtUyU4RltQ" identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.Metamodel" name="Metamodel" hint="" kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType" matcherConfiguration="_oYIgoHbaEeuKjtUyU4RltQ">
+    <ownedConfigurations xmi:type="stereotypematcher:StereotypeMatcherAdviceConfiguration" xmi:id="_oYIgoHbaEeuKjtUyU4RltQ" identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.advice.Metamodel" target="_Zp0SEHbaEeuKjtUyU4RltQ" matchedType="_Zp0SEHbaEeuKjtUyU4RltQ" profileUri="http://www.omg.org/spec/UML/20131001/StandardProfile">
+      <stereotypesQualifiedNames>StandardProfile::Metamodel</stereotypesQualifiedNames>
+    </ownedConfigurations>
+    <ownedConfigurations xmi:type="elementtypesconfigurations:AdviceBindingConfiguration" xmi:id="_noyccHbcEeuKjtUyU4RltQ" description="Creates the default metaclass in a new metamodel." identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.defaultmetaclass" target="_Zp0SEHbaEeuKjtUyU4RltQ" editHelperAdviceClassName="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.internal.advice.CreateDefaultMetaclassAdvice"/>
+    <ownedConfigurations xmi:type="constraints:ConstraintAdviceConfiguration" xmi:id="_Mb40sH0bEeutqsARUp2Vgg" identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.metamodel.constraint" target="_Zp0SEHbaEeuKjtUyU4RltQ">
+      <constraint xmi:type="stereotypematcher:RequiredStereotypeConstraintConfiguration" xmi:id="_cOYxMH0oEeujK9lz9OkrBA"/>
+      <constraint xmi:type="constraints:ReferenceConstraint" xmi:id="_d-w1kH0bEeutqsARUp2Vgg">
+        <permission xmi:type="constraints:AnyReference" xmi:id="_f86kUH0bEeutqsARUp2Vgg" permitted="true">
+          <filter xmi:type="filters:CompoundFilter" xmi:id="_o8u_AH0bEeutqsARUp2Vgg" filter="_vl9VwH0bEeutqsARUp2Vgg _Bf06UH0cEeutqsARUp2Vgg _Bn-wwH0cEeutqsARUp2Vgg _Bv_dQH0cEeutqsARUp2Vgg _Tz8OEH0gEeuVvMEaYK8Gsw _T9LCkH0gEeuVvMEaYK8Gsw" operator="or">
+            <ownedFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_vl9VwH0bEeutqsARUp2Vgg" elementType="_WtT9UHbdEeuKjtUyU4RltQ" relationship="subtype"/>
+            <ownedFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_Bf06UH0cEeutqsARUp2Vgg" relationship="specializationType">
+              <elementType xmi:type="elementtypesconfigurations:SpecializationTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Association"/>
+            </ownedFilter>
+            <ownedFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_Bn-wwH0cEeutqsARUp2Vgg" relationship="subtype">
+              <elementType xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Enumeration"/>
+            </ownedFilter>
+            <ownedFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_Bv_dQH0cEeutqsARUp2Vgg" relationship="subtype">
+              <elementType xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.PrimitiveType"/>
+            </ownedFilter>
+            <ownedFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_Tz8OEH0gEeuVvMEaYK8Gsw" relationship="subtype">
+              <elementType xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Comment"/>
+            </ownedFilter>
+            <ownedFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_T9LCkH0gEeuVvMEaYK8Gsw" relationship="specializationType">
+              <elementType xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Constraint"/>
+            </ownedFilter>
+          </filter>
+        </permission>
+        <permission xmi:type="constraints:AnyReference" xmi:id="_Zp2jcH0eEeuZAKqwE3yUlQ" permitted="false" referenceKind="containment"/>
+      </constraint>
+      <constraint xmi:type="constraints:RelationshipConstraint" xmi:id="_0yFaUH31EeurDK7l5MWvOA">
+        <permission xmi:type="constraints:EndPermission" xmi:id="_0yFaUX31EeurDK7l5MWvOA" permitted="true">
+          <endFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_0yFaUn31EeurDK7l5MWvOA" elementType="_WtT9UHbdEeuKjtUyU4RltQ" relationship="subtype"/>
+        </permission>
+        <permission xmi:type="constraints:EndPermission" xmi:id="_0yFaU331EeurDK7l5MWvOA" permitted="false"/>
+      </constraint>
+    </ownedConfigurations>
+    <ownedConfigurations xmi:type="elementtypesconfigurations:AdviceBindingConfiguration" xmi:id="_GPra4IEdEeu-otVmyAgEnA" identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.metamodelRequiredAttributesAdvice" target="_Zp0SEHbaEeuKjtUyU4RltQ" editHelperAdviceClassName="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.internal.advice.MetamodelRequiredAttributesAdvice"/>
+    <specializedTypes xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Model"/>
+  </elementTypeConfigurations>
+  <elementTypeConfigurations xmi:type="elementtypesconfigurations:SpecializationTypeConfiguration" xmi:id="_WtT9UHbdEeuKjtUyU4RltQ" identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.Metaclass" name="Metaclass" hint="" kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType" matcherConfiguration="_hu9F0HbdEeuKjtUyU4RltQ">
+    <ownedConfigurations xmi:type="stereotypematcher:StereotypeMatcherAdviceConfiguration" xmi:id="_hu9F0HbdEeuKjtUyU4RltQ" identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.advice.Metaclass" target="_WtT9UHbdEeuKjtUyU4RltQ" matchedType="_WtT9UHbdEeuKjtUyU4RltQ" profileUri="http://www.omg.org/spec/UML/20131001/StandardProfile">
+      <stereotypesQualifiedNames>StandardProfile::Metaclass</stereotypesQualifiedNames>
+    </ownedConfigurations>
+    <ownedConfigurations xmi:type="constraints:ConstraintAdviceConfiguration" xmi:id="_8qDnwH0nEeuxWesSwcABnQ" identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.metaclass.constraint" target="_WtT9UHbdEeuKjtUyU4RltQ">
+      <constraint xmi:type="stereotypematcher:RequiredStereotypeConstraintConfiguration" xmi:id="_EtQCIH0oEeuxWesSwcABnQ"/>
+      <constraint xmi:type="constraints:RelationshipConstraint" xmi:id="_aIPIcIEXEeu-otVmyAgEnA">
+        <permission xmi:type="constraints:EndPermission" xmi:id="_aIPIcYEXEeu-otVmyAgEnA" permitted="true">
+          <filter xmi:type="constraints:ElementTypeFilter" xmi:id="_aIPIcoEXEeu-otVmyAgEnA" relationship="specializationType">
+            <elementType xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Generalization"/>
+          </filter>
+          <endFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_aIPIc4EXEeu-otVmyAgEnA" elementType="_WtT9UHbdEeuKjtUyU4RltQ" relationship="subtype"/>
+        </permission>
+        <permission xmi:type="constraints:EndPermission" xmi:id="_0CssEIEnEeu8P6bR89chZg" permitted="true">
+          <filter xmi:type="constraints:ElementTypeFilter" xmi:id="_0CssEYEnEeu8P6bR89chZg" relationship="specializationType">
+            <elementType xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.AssociationBase"/>
+          </filter>
+          <endFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_0CssEoEnEeu8P6bR89chZg" elementType="_WtT9UHbdEeuKjtUyU4RltQ" relationship="subtype"/>
+        </permission>
+        <permission xmi:type="constraints:EndPermission" xmi:id="_aIPIdIEXEeu-otVmyAgEnA" permitted="false"/>
+      </constraint>
+      <constraint xmi:type="constraints:ReferenceConstraint" xmi:id="_Kr3bcIGjEeu5MZi-HRHmIw">
+        <permission xmi:type="constraints:AnyReference" xmi:id="_Kr3bcYGjEeu5MZi-HRHmIw" permitted="true">
+          <filter xmi:type="filters:CompoundFilter" xmi:id="_Kr3bcoGjEeu5MZi-HRHmIw" name="Contents of Class" filter="_Kr3bc4GjEeu5MZi-HRHmIw _Kr3bdIGjEeu5MZi-HRHmIw _Kr3bdYGjEeu5MZi-HRHmIw _Kr3bdoGjEeu5MZi-HRHmIw _Kr3bd4GjEeu5MZi-HRHmIw" operator="or">
+            <ownedFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_Kr3bc4GjEeu5MZi-HRHmIw" relationship="specializationType">
+              <elementType xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Operation"/>
+            </ownedFilter>
+            <ownedFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_Kr3bdIGjEeu5MZi-HRHmIw" relationship="specializationType">
+              <elementType xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Property"/>
+            </ownedFilter>
+            <ownedFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_Kr3bdYGjEeu5MZi-HRHmIw" relationship="specializationType">
+              <elementType xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Comment"/>
+            </ownedFilter>
+            <ownedFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_Kr3bdoGjEeu5MZi-HRHmIw" relationship="specializationType">
+              <elementType xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Constraint"/>
+            </ownedFilter>
+            <ownedFilter xmi:type="constraints:ElementTypeFilter" xmi:id="_Kr3bd4GjEeu5MZi-HRHmIw" relationship="specializationType">
+              <elementType xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.EnumerationLiteral"/>
+            </ownedFilter>
+          </filter>
+        </permission>
+        <permission xmi:type="constraints:AnyReference" xmi:id="_dwwosIGjEeu5MZi-HRHmIw" permitted="false" referenceKind="containment"/>
+      </constraint>
+    </ownedConfigurations>
+    <ownedConfigurations xmi:type="elementtypesconfigurations:AdviceBindingConfiguration" xmi:id="_75NwkIHQEeu4APS_uoP1tg" description="Advice to configure a newly created metaclass." identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.newMetaclassAdvice" target="_WtT9UHbdEeuKjtUyU4RltQ" editHelperAdviceClassName="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.internal.advice.NewMetaclassAdvice"/>
+    <specializedTypes xmi:type="elementtypesconfigurations:MetamodelTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/uml.elementtypesconfigurations#org.eclipse.papyrus.uml.Class"/>
+  </elementTypeConfigurations>
+</elementtypesconfigurations:ElementTypeSetConfiguration>

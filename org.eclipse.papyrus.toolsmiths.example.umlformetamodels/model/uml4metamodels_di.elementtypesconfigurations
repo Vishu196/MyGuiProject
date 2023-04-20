@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<elementtypesconfigurations:ElementTypeSetConfiguration xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:elementtypesconfigurations="http://www.eclipse.org/papyrus/infra/elementtypesconfigurations/1.2" xmi:id="_jQGNoHbLEeuDcqwoKFAHeg" description="Visual (diagram) element types for the UML for Metamodels language customization." identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.di" name="UML Diagrams for Metamodels" metamodelNsURI="http://www.eclipse.org/uml2/5.0.0/UML">
+  <elementTypeConfigurations xmi:type="elementtypesconfigurations:SpecializationTypeConfiguration" xmi:id="_wzqWwHuhEeuoHIXc8g4Zpw" description="The visualization of a metaclass in the metamodel class diagram." identifier="org.eclipse.papyrus.toolsmiths.example.umlformetamodels.Metaclass_shape" name="Metaclass Shape" hint="Class_Shape" kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType">
+    <specializedTypes xmi:type="elementtypesconfigurations:SpecializationTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.toolsmiths.example.umlformetamodels/model/uml4metamodels.elementtypesconfigurations#_WtT9UHbdEeuKjtUyU4RltQ"/>
+    <specializedTypes xmi:type="elementtypesconfigurations:SpecializationTypeConfiguration" href="platform:/plugin/org.eclipse.papyrus.uml.service.types/model/umldi.elementtypesconfigurations#org.eclipse.papyrus.umldi.Class_Shape"/>
+  </elementTypeConfigurations>
+</elementtypesconfigurations:ElementTypeSetConfiguration>

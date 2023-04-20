@@ -25,10 +25,10 @@ public class SerialNetwork {
 	public static final byte pType_startFail = 0x27;
 	public static final byte pType_sendData = 0x28;
 	public static final byte pType_data = 0x29;
-//	public static final byte pType_stopData = 0x30;
-//	public static final byte pType_stopOk = 0x31;
+	public static final byte pType_stopData = 0x30;
+	public static final byte pType_stopOk = 0x31;
 	public static final byte pType_error = 0x32;
-	public static final byte pType_consoleText = 0x33;
+	//public static final byte pType_consoleText = 0x33;
 	public static final byte[] error = {(byte) 0xff};
 		
 	// function to get available serial ports and return the names
@@ -97,7 +97,7 @@ public class SerialNetwork {
 			return error; 		
 		}
 		
-		/*read the first byte, check if it is startByte or consoleText Byte*/
+		/*read the first byte, check if it is startByte*/
 		mPort.readBytes(temp,bytesToRead); 
 		start[0] = temp[0];
 		if (temp[0] != startByte) {

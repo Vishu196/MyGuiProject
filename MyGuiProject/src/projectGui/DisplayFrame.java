@@ -43,6 +43,7 @@ import javax.swing.text.StyleConstants;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.ITracePainter;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 
@@ -51,21 +52,21 @@ public class DisplayFrame
 	private JFrame mainFrame;
 	private JTextField cmnd_Field, spo2Field,bpmField, ppgField;
 	private JComboBox<String> portList ;
-	private JButton Start, Connect, R, Disconnect, clearGraph, save, stop;
-	private JPanel graphPanel, graphPanel1, graphPanel2;
+	private JButton Start, Connect, R, Disconnect, clearGraph, save;
+	private JPanel graphPanel;
 	private JTextPane toutTextPane;
 	private Timer displayUpdateTimer;
 	public int var = 1;
 	public int i = 0;
-	static Chart2D chart, chart1, chart2;
+	static Chart2D chart;
 	static final int NTRACES = 3;
     static ITrace2D mtraces[] = new ITrace2D[3];
-	private ITrace2D trace, trace1, trace2;
-    private int numTraces = 1000;
+	private ITrace2D trace;
+    private int numTraces = 500;
     private SimpleAttributeSet TextSet = new SimpleAttributeSet();
     static int Downl_Cnt;
     static boolean Pb_Ready;
-    static final int NROWS = 1000, NCOLS = 3;
+    static final int NROWS = 500, NCOLS = 3;
     static double Plot_Buffer[][] = new double[NROWS][NCOLS];
     static int Pb_NValues;
     private String file = "OutputFile";
@@ -297,30 +298,15 @@ public class DisplayFrame
 		graphPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		springLayout.putConstraint(SpringLayout.NORTH, graphPanel, 55, SpringLayout.NORTH, mainFrame.getContentPane());
 		springLayout.putConstraint(SpringLayout.WEST, graphPanel, 10, SpringLayout.EAST, scrollPane);
-		springLayout.putConstraint(SpringLayout.SOUTH, graphPanel, -340, SpringLayout.NORTH, Cmnd_panel);
+		springLayout.putConstraint(SpringLayout.SOUTH, graphPanel, -10, SpringLayout.NORTH, Cmnd_panel);
 		springLayout.putConstraint(SpringLayout.EAST, graphPanel, -10, SpringLayout.EAST, mainFrame.getContentPane());
 		
-		graphPanel1 = new JPanel();
-		graphPanel1.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		springLayout.putConstraint(SpringLayout.NORTH, graphPanel1, 10, SpringLayout.SOUTH, graphPanel);
-		springLayout.putConstraint(SpringLayout.WEST, graphPanel1, 10, SpringLayout.EAST, scrollPane);
-		springLayout.putConstraint(SpringLayout.SOUTH, graphPanel1, -170, SpringLayout.NORTH, Cmnd_panel);
-		springLayout.putConstraint(SpringLayout.EAST, graphPanel1, -10, SpringLayout.EAST, mainFrame.getContentPane());
-		
-		graphPanel2 = new JPanel();
-		graphPanel2.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		springLayout.putConstraint(SpringLayout.NORTH, graphPanel2, 10, SpringLayout.SOUTH, graphPanel1);
-		springLayout.putConstraint(SpringLayout.WEST, graphPanel2, 10, SpringLayout.EAST, scrollPane);
-		springLayout.putConstraint(SpringLayout.SOUTH, graphPanel2, -10, SpringLayout.NORTH, Cmnd_panel);
-		springLayout.putConstraint(SpringLayout.EAST, graphPanel2, -10, SpringLayout.EAST, mainFrame.getContentPane());
 		
 		//adding Tout text pane
 		toutTextPane = new JTextPane();
 		toutTextPane.setEditable(false);
 		scrollPane.setViewportView(toutTextPane);
 		mainFrame.getContentPane().add(graphPanel);
-		mainFrame.getContentPane().add(graphPanel1);
-		mainFrame.getContentPane().add(graphPanel2);
 		
 		// adding menu bar and items with action listener
 		JMenuBar menuBar = new JMenuBar();
@@ -382,83 +368,40 @@ public class DisplayFrame
 	}
 	
 	//function for displaying readings in Readings panel
-	private void displayReading(int spo2, int bpm, int ppg) {
-		spo2Field.setText(Integer.toString(spo2));
-		bpmField.setText(Integer.toString(bpm));
-		ppgField.setText(Integer.toString(ppg));
+	private void displayReading(int spo2, int bpm, double ppg) {
+		spo2Field.setText(String.valueOf(spo2));
+		bpmField.setText(String.valueOf(bpm));
+		ppgField.setText(String.valueOf(ppg));
 	}
 	
 	//function to create chart, adding it to graph panel and setting the required parameters;  creating 3 different chart to plot 3 graphs
 	private void createChart() {
 		
-		//creating first chart
+		//creating third chart
 		chart = new Chart2D();
 		trace = new Trace2DLtd(numTraces);
-		trace.setColor(Color.RED);
-		IAxis axisX = chart.getAxisX();
-	    axisX.setPaintGrid(true);
-	    axisX.getAxisTitle().setTitle("Time (s)");
-	    IAxis axisY = chart.getAxisY();
-	    axisY.setPaintGrid(true);
-	    axisY.getAxisTitle().setTitle("Heart Rate");
-	    
+		trace.setColor(Color.MAGENTA);
+		IAxis axisX2 = chart.getAxisX();
+	    axisX2.setPaintGrid(true);
+	    axisX2.getAxisTitle().setTitle("Time (s)");
+	    IAxis axisY2 = chart.getAxisY();
+	    axisY2.setPaintGrid(true);
+	    axisY2.getAxisTitle().setTitle("IR Data");
 
 		chart.addTrace(trace);
-		trace.setName("Graph for Heart Rate");
+		trace.setName("IR Data");
 		
 		graphPanel.setLayout(new BorderLayout(0, 0));
 		graphPanel.add(chart);
 		chart.setVisible(true);
 		graphPanel.setVisible(true);
-		graphPanel.repaint();
-	
-		//creating second chart
-		chart1 = new Chart2D();
-		trace1 = new Trace2DLtd(numTraces);
-		trace1.setColor(Color.BLUE);
-		IAxis axisX1 = chart1.getAxisX();
-	    axisX1.setPaintGrid(true);
-	    axisX1.getAxisTitle().setTitle("Time (s)");
-	    IAxis axisY1 = chart1.getAxisY();
-	    axisY1.setPaintGrid(true);
-	    axisY1.getAxisTitle().setTitle("PPG");
-
-		chart1.addTrace(trace1);
-		trace1.setName("PPG");
-		
-		graphPanel1.setLayout(new BorderLayout(0, 0));
-		graphPanel1.add(chart1);
-		chart1.setVisible(true);
-		graphPanel1.setVisible(true);
-		graphPanel1.repaint();
-		
-		
-		//creating third chart
-		chart2 = new Chart2D();
-		trace2 = new Trace2DLtd(numTraces);
-		trace2.setColor(Color.MAGENTA);
-		IAxis axisX2 = chart2.getAxisX();
-	    axisX2.setPaintGrid(true);
-	    axisX2.getAxisTitle().setTitle("Time (s)");
-	    IAxis axisY2 = chart2.getAxisY();
-	    axisY2.setPaintGrid(true);
-	    axisY2.getAxisTitle().setTitle("r");
-
-		chart2.addTrace(trace2);
-		trace2.setName("r component");
-		
-		graphPanel2.setLayout(new BorderLayout(0, 0));
-		graphPanel2.add(chart2);
-		chart2.setVisible(true);
-		graphPanel2.setVisible(true);
-		graphPanel2.repaint();		
+		graphPanel.repaint();		
 	}
 	
 	//function to plot point at x,y on the chart; we have to pass value of x & y as parameter
 	private void plotChart(int xvalue, double yvalue, double y1value, double y2value) {	
-		trace.addPoint(xvalue, yvalue);	
-		trace1.addPoint(xvalue,y1value);
-		trace2.addPoint(xvalue,y2value);
+		
+		trace.addPoint(xvalue,y2value);
 	}
 	
 	//function to clear Graph
@@ -466,10 +409,6 @@ public class DisplayFrame
 		
 		trace.removeAllPoints();
 		trace.addPoint(0,0);
-		trace1.removeAllPoints();
-		trace1.addPoint(0,0);
-		trace2.removeAllPoints();
-		trace2.addPoint(0,0);
 	
 		save.setEnabled(false);
 		//Pb_Ready = true;
@@ -482,15 +421,12 @@ public class DisplayFrame
 	            public void run() {
 	                // save the chart to a file
 	                try {
-	                    BufferedImage bi = chart.snapShot();
-	                    ImageIO.write(bi, "JPEG", new File("HeartRate.jpg"));
-	                    BufferedImage bi1 = chart1.snapShot();
-	                    ImageIO.write(bi1, "JPEG", new File("PPG.jpg"));
-	                    BufferedImage bi2 = chart2.snapShot();
+	                    
+	                    BufferedImage bi2 = chart.snapShot();
 	                    ImageIO.write(bi2, "JPEG", new File("rValue.jpg"));
 	                    
-	                    JOptionPane.showMessageDialog(mainFrame, "Graphs and Data Saved");
-	                    printTextWin("\n Graphs and Data Saved ", 1, true);
+	                    JOptionPane.showMessageDialog(mainFrame, "Graph and Data Saved");
+	                    printTextWin("\n Graph and Data Saved ", 1, true);
 	                    System.out.println("\n Graph Saved  \n ");
 	                    // other possible file formats are PNG and BMP
 	                } catch (Exception ex) {
@@ -534,7 +470,7 @@ public class DisplayFrame
 			R.setEnabled(false);
 			portList.setEnabled(false);
 			Start.setEnabled(true);
-			
+			//printTextWin("msg:- "+ SerialNetwork.recvInfo(), 3, true);
 		}
 		else {
 			String f = "Connection failed" ;
@@ -562,6 +498,13 @@ public class DisplayFrame
 	private void actionStart() {
 		Start.setEnabled(false);
 		sendPacket(SerialNetwork.pType_start);
+		clearChart();
+		
+		for(int i = 0 ; i < NROWS ; i++){
+			for(int j = 0 ; j < NCOLS; j++){
+			Plot_Buffer[i][j] =  0;
+			}
+			}
 		//stop.setEnabled(true);
 
 	}
@@ -716,7 +659,7 @@ public class DisplayFrame
 						Downl_Cnt = 0;
 						printTextWin(" ", 1, true);
 					}
-					sendPacket(SerialNetwork.pType_sendData);
+					//sendPacket(SerialNetwork.pType_sendData);
 					break;
 
 				case SerialNetwork.pType_error:
@@ -726,13 +669,13 @@ public class DisplayFrame
 //					Pb_Ready = false;
 //					break;
 					
-				case SerialNetwork.pType_consoleText:
-					String s = new String(rData, StandardCharsets.UTF_8);
-				    System.out.println("Output : " + s);
-				    printTextWin(s , 2, true);
-					break;
-					
-					
+//				case SerialNetwork.pType_consoleText:
+//					String s = new String(rData, StandardCharsets.UTF_8);
+//				    System.out.println("Output : " + s);
+//				    printTextWin(s , 2, true);
+//					break;
+//					
+//					
 				}
 			}
 			catch  (NumberFormatException e) {
@@ -749,13 +692,20 @@ public class DisplayFrame
 			}
 			return;
 		}
+		
 		int spo2 = (int)data[1];
-		int bpm = (int)data[2];
-		int ppg = (int)data[3];
+		int bpm = 0x00FF & (int)data[2];
+				
+		int a = 0x00FF & ((int)data[3]);
+		int b = 0x00FF & ((int)data[4]);
+		int ppg1 = ((a<<8) | b);
+		//int ppg1 = -1356;
+		double ppg = (ppg1*1.0)/100;
+		
 		
 		displayReading(spo2, bpm, ppg);
 		if(DEBUG){
-		System.out.printf("Values: %d %d %d\n", spo2,bpm,ppg);
+		System.out.printf("Values: %d %d %f\n", spo2,bpm,ppg);
 		}
 		if(Pb_Ready = true) {
 			Plot_Buffer[Pb_NValues][0] = (double)spo2;
